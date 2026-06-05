@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -65,8 +64,7 @@ function getStatusBadge(politico: Politico): { text: string; bg: string; textCol
 }
 
 export default function PoliticoPage() {
-  const params = useParams<{ slug: string[] }>()
-  const politicoId = Number(params.slug?.[0])
+  const [politicoId, setPoliticoId] = useState<number | null>(null)
 
   const [activeTab, setActiveTab] = useState<Tab>('resumo')
   const [showStoryModal, setShowStoryModal] = useState(false)
@@ -83,6 +81,12 @@ export default function PoliticoPage() {
   const [tabLoading, setTabLoading] = useState(false)
 
   useEffect(() => {
+    const id = Number(new URLSearchParams(window.location.search).get('id'))
+    setPoliticoId(Number.isFinite(id) ? id : null)
+  }, [])
+
+  useEffect(() => {
+    if (!politicoId) return
     getPolitico(politicoId)
       .then(setPolitico)
       .catch(async () => setPolitico(await loadStaticPolitico(politicoId)))
@@ -91,17 +95,19 @@ export default function PoliticoPage() {
 
   useEffect(() => {
     async function loadTab() {
+      if (!politicoId) return
+      const id = politicoId
       setTabLoading(true)
       try {
         if (activeTab === 'condenacoes' && condenacoes.length === 0) {
-          const data = await getCondenacoes(politicoId).catch(() => [])
+          const data = await getCondenacoes(id).catch(() => [])
           setCondenacoes(data)
         }
         if (activeTab === 'gastos' && gastosResumo.length === 0) {
           const [resumo, mes, itens] = await Promise.all([
-            getGastosResumidos(politicoId).catch(() => []),
-            getGastosPorMes(politicoId).catch(() => []),
-            getGastos(politicoId).catch(() => ({ data: [], total: 0 })),
+            getGastosResumidos(id).catch(() => []),
+            getGastosPorMes(id).catch(() => []),
+            getGastos(id).catch(() => ({ data: [], total: 0 })),
           ])
           setGastosResumo(resumo)
           setGastosMes(mes)
@@ -109,13 +115,13 @@ export default function PoliticoPage() {
         }
         if (activeTab === 'discursos' && discursos.length === 0) {
           const [disc, promessas] = await Promise.all([
-            getDiscursos(politicoId).catch(() => ({ data: [], total: 0 })),
-            getPromessas(politicoId).catch(() => []),
+            getDiscursos(id).catch(() => ({ data: [], total: 0 })),
+            getPromessas(id).catch(() => []),
           ])
           setDiscursos(disc.data)
           if (promessas.length > 0) {
             const comp = await compararDiscursos({
-              politico_id: politicoId,
+              politico_id: id,
               promessas: promessas.map((p) => p.descricao),
             }).catch(() => [])
             setComparacoes(comp)
@@ -125,7 +131,7 @@ export default function PoliticoPage() {
         setTabLoading(false)
       }
     }
-    if (!loading) loadTab()
+    if (!loading && politicoId) loadTab()
   }, [activeTab, loading, politicoId])
 
   if (loading) {
