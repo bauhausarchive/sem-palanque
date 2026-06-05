@@ -12,9 +12,12 @@ export interface Politico {
   telefone?: string
   redeSocial?: string[]
   score_transparencia: number // 0-100
+  score_disponivel?: boolean
   total_condenacoes: number
   total_processos: number
   total_gastos_ceap: number
+  fonte_gastos?: string
+  observacao_dados?: string
   mandatos: Mandato[]
 }
 
@@ -111,6 +114,8 @@ export interface PoliticoSearchResult {
   urlFoto?: string
   total_condenacoes: number
   score_transparencia: number
+  score_disponivel?: boolean
+  observacao_dados?: string
 }
 
 export interface Stats {

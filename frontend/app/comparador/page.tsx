@@ -6,51 +6,40 @@ import DiscursoComparador from '@/components/DiscursoComparador'
 import { compararDiscursos } from '@/lib/api'
 import type { PoliticoSearchResult, ComparacaoResult } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { featuredStaticPoliticos, searchStaticPoliticos } from '@/lib/static-politicos'
 
 async function analisarPolitico(politicoId: number, youtubeLinks: string[]): Promise<ComparacaoResult[]> {
   return compararDiscursos({ politico_id: politicoId, promessas: [], youtube_links: youtubeLinks })
 }
 
-const MOCK_POLITICOS: PoliticoSearchResult[] = [
-  { id: 1, nome: 'João da Silva', partido: 'PDT', siglaUf: 'SP', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 2, score_transparencia: 35 },
-  { id: 2, nome: 'Maria Oliveira', partido: 'MDB', siglaUf: 'MG', cargo: 'SENADOR', total_condenacoes: 0, score_transparencia: 82 },
-  { id: 3, nome: 'Carlos Mendes', partido: 'PT', siglaUf: 'RJ', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 1, score_transparencia: 54 },
-  { id: 4, nome: 'Ana Ferreira', partido: 'PSDB', siglaUf: 'RS', cargo: 'SENADOR', total_condenacoes: 0, score_transparencia: 91 },
-  { id: 5, nome: 'Paulo Souza', partido: 'PL', siglaUf: 'BA', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 3, score_transparencia: 18 },
-  { id: 6, nome: 'Beatriz Costa', partido: 'PSOL', siglaUf: 'CE', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 0, score_transparencia: 78 },
-]
-
-const MOCK_RESULTADOS: ComparacaoResult[] = [
-  {
-    promessa: { id: 1, politicoId: 0, descricao: 'Declarou em entrevista ao G1 que nunca votaria a favor de cortes na saúde pública.', fonte: 'portal_noticias', dataPromessa: '2024-03-10', tema: 'saúde', cumprida: null },
-    discursos_relacionados: [{ discurso: { id: 10, politicoId: 0, dataHoraInicio: '2024-05-22T10:00:00', sumario: 'Votou a favor da PEC que reduzia em R$ 200 milhões o orçamento do SUS.', keywords: ['saúde', 'corte', 'SUS'], tipoDiscurso: 'VOTAÇÃO' }, similaridade: 0.18, tipo: 'contradicao', trecho_destacado: 'votou a favor da PEC que reduzia em R$ 200 milhões o orçamento do SUS' }],
-    score_geral: 0.18, veredicto: 'contradita',
-  },
-  {
-    promessa: { id: 2, politicoId: 0, descricao: 'Afirmou no YouTube que destinaria 30% dos royalties do petróleo à educação.', fonte: 'youtube', dataPromessa: '2024-02-15', tema: 'educação', cumprida: null },
-    discursos_relacionados: [{ discurso: { id: 11, politicoId: 0, dataHoraInicio: '2024-06-10T14:30:00', sumario: 'Discursou em plenário defendendo que 30% dos royalties do petróleo fossem destinados à educação pública.', keywords: ['educação', 'royalties'], tipoDiscurso: 'DISCURSO' }, similaridade: 0.91, tipo: 'confirmacao', trecho_destacado: 'defendendo que 30% dos royalties do petróleo fossem destinados à educação pública' }],
-    score_geral: 0.91, veredicto: 'cumprida',
-  },
-  {
-    promessa: { id: 3, politicoId: 0, descricao: 'Declarou na Folha de S.Paulo que seria contra qualquer privatização de estatais.', fonte: 'portal_noticias', dataPromessa: '2023-11-20', tema: 'economia', cumprida: null },
-    discursos_relacionados: [{ discurso: { id: 12, politicoId: 0, dataHoraInicio: '2024-04-08T09:00:00', sumario: 'Votou favorável ao projeto de concessão de trechos da Petrobras ao setor privado.', keywords: ['privatização', 'concessão'], tipoDiscurso: 'VOTAÇÃO' }, similaridade: 0.22, tipo: 'contradicao', trecho_destacado: 'votou favorável ao projeto de concessão de trechos da Petrobras ao setor privado' }],
-    score_geral: 0.22, veredicto: 'contradita',
-  },
-]
-
 const FONTES_MONITORADAS = ['G1', 'Folha de S.Paulo', 'UOL', 'O Globo', 'Agência Brasil', 'Estadão', 'R7', 'CNN Brasil', 'BBC Brasil']
 
 function getStatusBadge(p: PoliticoSearchResult) {
+  if (p.score_disponivel === false) return { text: 'PRÉ-CANDIDATO', bg: '#1a1a1a', color: '#fff' }
   if (p.total_condenacoes > 0) return { text: 'CONDENADO', bg: '#FF2020', color: '#fff' }
   if (p.score_transparencia >= 70) return { text: 'FICHA LIMPA', bg: '#1A6BFF', color: '#fff' }
   return { text: 'INVESTIGADO', bg: '#FFE500', color: '#000' }
 }
 
-function PoliticoDropdown({ onSelect }: { onSelect: (p: PoliticoSearchResult) => void }) {
+function PoliticoDropdown({ onSelect }: { onSelect: (p: PoliticoSearchResult | null) => void }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<PoliticoSearchResult | null>(null)
+  const [options, setOptions] = useState<PoliticoSearchResult[]>([])
   const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    featuredStaticPoliticos(40).then(setOptions)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    if (!query.trim()) {
+      featuredStaticPoliticos(40).then(setOptions)
+      return
+    }
+    searchStaticPoliticos(query, 40).then(setOptions)
+  }, [query, open])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -59,12 +48,6 @@ function PoliticoDropdown({ onSelect }: { onSelect: (p: PoliticoSearchResult) =>
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  const filtered = MOCK_POLITICOS.filter((p) =>
-    !query || p.nome.toLowerCase().includes(query.toLowerCase()) ||
-    p.partido.toLowerCase().includes(query.toLowerCase()) ||
-    p.siglaUf.toLowerCase().includes(query.toLowerCase())
-  )
 
   function handleSelect(p: PoliticoSearchResult) {
     setSelected(p)
@@ -76,7 +59,7 @@ function PoliticoDropdown({ onSelect }: { onSelect: (p: PoliticoSearchResult) =>
   function handleClear() {
     setSelected(null)
     setQuery('')
-    onSelect(null as any)
+    onSelect(null)
   }
 
   return (
@@ -121,11 +104,12 @@ function PoliticoDropdown({ onSelect }: { onSelect: (p: PoliticoSearchResult) =>
 
           {/* List */}
           <div className="max-h-72 overflow-y-auto">
-            {filtered.length === 0 && (
+            {options.length === 0 && (
               <p className="px-4 py-6 text-center text-xs text-white/30">Nenhum político encontrado.</p>
             )}
-            {filtered.map((p) => {
+            {options.map((p) => {
               const badge = getStatusBadge(p)
+              const scoreColor = p.score_disponivel === false ? '#ffffff40' : p.score_transparencia >= 70 ? '#1A6BFF' : p.score_transparencia >= 40 ? '#FFE500' : '#FF2020'
               return (
                 <button
                   key={p.id}
@@ -135,9 +119,9 @@ function PoliticoDropdown({ onSelect }: { onSelect: (p: PoliticoSearchResult) =>
                   {/* Score */}
                   <div
                     className="flex-shrink-0 w-10 text-center text-xl font-black leading-none"
-                    style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', color: p.score_transparencia >= 70 ? '#1A6BFF' : p.score_transparencia >= 40 ? '#FFE500' : '#FF2020' }}
+                    style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif', color: scoreColor }}
                   >
-                    {p.score_transparencia}
+                    {p.score_disponivel === false ? '—' : p.score_transparencia}
                   </div>
                   {/* Info */}
                   <div className="flex-1 min-w-0">
@@ -202,7 +186,7 @@ export default function ComparadorPage() {
       setLoadingStep('Cruzando com discursos parlamentares…')
       await new Promise((r) => setTimeout(r, 900))
       setLoadingStep('Calculando coerência com IA…')
-      const res = await analisarPolitico(selectedPolitico.id, youtubeLinks).catch(() => MOCK_RESULTADOS)
+      const res = await analisarPolitico(selectedPolitico.id, youtubeLinks).catch(() => [])
       setResultados(res)
     } catch {
       setError('Erro ao analisar. Verifique se o servidor está disponível.')
@@ -367,7 +351,9 @@ export default function ComparadorPage() {
 
             {resultados && resultados.length === 0 && (
               <div className="flex h-40 items-center justify-center border border-dashed border-[#1a1a1a]">
-                <p className="text-sm font-medium text-white/30">Nenhuma declaração encontrada.</p>
+                <p className="px-6 text-center text-sm font-medium text-white/30">
+                  Nenhuma declaração consolidada. O protótipo não exibe exemplos fictícios de promessas ou discursos.
+                </p>
               </div>
             )}
           </div>

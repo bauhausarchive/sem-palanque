@@ -7,6 +7,7 @@ import PoliticoCard from '@/components/PoliticoCard'
 import { searchPoliticos, getStats, getFeaturedPoliticos } from '@/lib/api'
 import type { PoliticoSearchResult, Stats } from '@/lib/types'
 import { formatCurrency, formatNumber, formatDate } from '@/lib/utils'
+import { featuredStaticPoliticos, searchStaticPoliticos } from '@/lib/static-politicos'
 import Link from 'next/link'
 
 const MOCK_STATS: Stats = {
@@ -16,15 +17,6 @@ const MOCK_STATS: Stats = {
   total_gastos_ceap: 285_000_000,
   ultima_atualizacao: new Date().toISOString(),
 }
-
-const MOCK_FEATURED: PoliticoSearchResult[] = [
-  { id: 1, nome: 'João da Silva', partido: 'PDT', siglaUf: 'SP', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 2, score_transparencia: 35 },
-  { id: 2, nome: 'Maria Oliveira', partido: 'MDB', siglaUf: 'MG', cargo: 'SENADOR', total_condenacoes: 0, score_transparencia: 82 },
-  { id: 3, nome: 'Carlos Mendes', partido: 'PT', siglaUf: 'RJ', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 1, score_transparencia: 54 },
-  { id: 4, nome: 'Ana Ferreira', partido: 'PSDB', siglaUf: 'RS', cargo: 'SENADOR', total_condenacoes: 0, score_transparencia: 91 },
-  { id: 5, nome: 'Paulo Souza', partido: 'PL', siglaUf: 'BA', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 3, score_transparencia: 18 },
-  { id: 6, nome: 'Beatriz Costa', partido: 'PSOL', siglaUf: 'CE', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 0, score_transparencia: 78 },
-]
 
 const DATA_SOURCES = [
   { name: 'Câmara dos Deputados', desc: 'Discursos, despesas CEAP e votações', url: 'https://dadosabertos.camara.leg.br' },
@@ -42,17 +34,19 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
+    featuredStaticPoliticos(6).then(setFeatured)
+
     getStats()
       .then(setStats)
       .catch(() => setStats(MOCK_STATS))
 
     getFeaturedPoliticos()
       .then(setFeatured)
-      .catch(() => setFeatured(MOCK_FEATURED))
+      .catch(() => undefined)
   }, [])
 
   async function handleSearchSelect(p: PoliticoSearchResult) {
-    const res = await searchPoliticos(p.nome).catch(() => ({ data: [p] }))
+    const res = await searchPoliticos(p.nome).catch(async () => ({ data: await searchStaticPoliticos(p.nome) }))
     setSearchResults(res.data)
     setSearchQuery(p.nome)
   }
@@ -168,7 +162,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(featured.length > 0 ? featured : MOCK_FEATURED).map((p) => (
+          {featured.map((p) => (
             <PoliticoCard key={p.id} politico={p} />
           ))}
         </div>

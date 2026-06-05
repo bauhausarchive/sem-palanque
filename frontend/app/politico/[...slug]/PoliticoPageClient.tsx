@@ -25,6 +25,7 @@ import {
   getPromessas,
   compararDiscursos,
 } from '@/lib/api'
+import { loadStaticPolitico } from '@/lib/static-politicos'
 import type {
   Politico,
   Condenacao,
@@ -57,6 +58,7 @@ function getScoreColor(score: number): string {
 }
 
 function getStatusBadge(politico: Politico): { text: string; bg: string; textColor: string } {
+  if (politico.score_disponivel === false) return { text: 'PRÉ-CANDIDATO 2026', bg: '#1a1a1a', textColor: '#fff' }
   if (politico.total_condenacoes > 0) return { text: 'CONDENADO', bg: '#FF2020', textColor: '#fff' }
   if (politico.score_transparencia >= 70) return { text: 'FICHA LIMPA', bg: '#1A6BFF', textColor: '#fff' }
   return { text: 'INVESTIGADO', bg: '#FFE500', textColor: '#000' }
@@ -83,26 +85,7 @@ export default function PoliticoPage() {
   useEffect(() => {
     getPolitico(politicoId)
       .then(setPolitico)
-      .catch(() => {
-        setPolitico({
-          id: politicoId,
-          nome: 'João da Silva',
-          nomeCivil: 'João Augusto da Silva',
-          partido: 'PDT',
-          siglaUf: 'SP',
-          cargo: 'DEPUTADO_FEDERAL',
-          legislaturaAtual: 57,
-          urlFoto: 'https://www.camara.leg.br/internet/deputado/bandep/204379.jpg',
-          score_transparencia: 35,
-          total_condenacoes: 2,
-          total_processos: 5,
-          total_gastos_ceap: 120_000,
-          mandatos: [
-            { cargo: 'DEPUTADO_FEDERAL', partido: 'PDT', siglaUf: 'SP', anoInicio: 2019 },
-            { cargo: 'VEREADOR', partido: 'PDT', siglaUf: 'SP', anoInicio: 2013, anoFim: 2016 },
-          ],
-        })
-      })
+      .catch(async () => setPolitico(await loadStaticPolitico(politicoId)))
       .finally(() => setLoading(false))
   }, [politicoId])
 
@@ -111,14 +94,14 @@ export default function PoliticoPage() {
       setTabLoading(true)
       try {
         if (activeTab === 'condenacoes' && condenacoes.length === 0) {
-          const data = await getCondenacoes(politicoId).catch(() => MOCK_CONDENACOES)
+          const data = await getCondenacoes(politicoId).catch(() => [])
           setCondenacoes(data)
         }
         if (activeTab === 'gastos' && gastosResumo.length === 0) {
           const [resumo, mes, itens] = await Promise.all([
-            getGastosResumidos(politicoId).catch(() => MOCK_GASTOS_RESUMO),
-            getGastosPorMes(politicoId).catch(() => MOCK_GASTOS_MES),
-            getGastos(politicoId).catch(() => ({ data: MOCK_GASTOS_ITENS, total: MOCK_GASTOS_ITENS.length })),
+            getGastosResumidos(politicoId).catch(() => []),
+            getGastosPorMes(politicoId).catch(() => []),
+            getGastos(politicoId).catch(() => ({ data: [], total: 0 })),
           ])
           setGastosResumo(resumo)
           setGastosMes(mes)
@@ -126,15 +109,15 @@ export default function PoliticoPage() {
         }
         if (activeTab === 'discursos' && discursos.length === 0) {
           const [disc, promessas] = await Promise.all([
-            getDiscursos(politicoId).catch(() => ({ data: MOCK_DISCURSOS, total: 3 })),
-            getPromessas(politicoId).catch(() => MOCK_PROMESSAS),
+            getDiscursos(politicoId).catch(() => ({ data: [], total: 0 })),
+            getPromessas(politicoId).catch(() => []),
           ])
           setDiscursos(disc.data)
           if (promessas.length > 0) {
             const comp = await compararDiscursos({
               politico_id: politicoId,
               promessas: promessas.map((p) => p.descricao),
-            }).catch(() => MOCK_COMPARACOES)
+            }).catch(() => [])
             setComparacoes(comp)
           }
         }
@@ -164,7 +147,7 @@ export default function PoliticoPage() {
     )
   }
 
-  const scoreColor = getScoreColor(politico.score_transparencia)
+  const scoreColor = politico.score_disponivel === false ? '#ffffff40' : getScoreColor(politico.score_transparencia)
   const badge = getStatusBadge(politico)
 
   return (
@@ -270,7 +253,7 @@ export default function PoliticoPage() {
                 Compartilhar
               </button>
               <div className="border border-[#1a1a1a] p-5 min-w-[160px]">
-                <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Transparência</p>
+                <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Integridade</p>
                 <div
                   className="text-7xl font-black leading-none tracking-tighter"
                   style={{
@@ -278,12 +261,12 @@ export default function PoliticoPage() {
                     color: scoreColor,
                   }}
                 >
-                  {politico.score_transparencia}
+                  {politico.score_disponivel === false ? '—' : politico.score_transparencia}
                 </div>
                 <div className="mt-3 h-2 w-full bg-[#1a1a1a]">
                   <div
                     className="h-full"
-                    style={{ width: `${politico.score_transparencia}%`, background: scoreColor }}
+                    style={{ width: `${politico.score_disponivel === false ? 0 : politico.score_transparencia}%`, background: scoreColor }}
                   />
                 </div>
               </div>
@@ -339,11 +322,23 @@ export default function PoliticoPage() {
                     color="#FFE500"
                   />
                   <InfoCard
-                    label="Gastos CEAP (ano)"
-                    value={formatCurrency(politico.total_gastos_ceap)}
+                    label={politico.cargo === 'DEPUTADO_FEDERAL' ? 'Gastos CEAP (ano)' : 'Gastos públicos consolidados'}
+                    value={politico.total_gastos_ceap > 0 ? formatCurrency(politico.total_gastos_ceap) : '—'}
                     color="#1A6BFF"
                   />
                 </div>
+
+                {politico.observacao_dados && (
+                  <div className="border border-[#1a1a1a] bg-[#0a0a0a] p-5">
+                    <p className="mb-2 text-xs font-black uppercase tracking-widest text-[#FFE500]">Dados em consolidação</p>
+                    <p className="text-sm font-medium leading-relaxed text-white/60">{politico.observacao_dados}</p>
+                    {politico.fonte_gastos && (
+                      <p className="mt-3 text-xs font-black uppercase tracking-widest text-white/30">
+                        Fonte prevista: {politico.fonte_gastos}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <div className="flex items-center gap-4 mb-4">
@@ -356,7 +351,7 @@ export default function PoliticoPage() {
                     </h3>
                   </div>
                   <div className="space-y-0 border-t border-[#1a1a1a]">
-                    {politico.mandatos.map((m, i) => (
+                    {politico.mandatos.length > 0 ? politico.mandatos.map((m, i) => (
                       <div key={i} className="flex items-center gap-4 border-b border-[#1a1a1a] p-4 text-sm hover:bg-[#0a0a0a] transition-colors">
                         <Calendar className="h-4 w-4 flex-shrink-0 text-white/30" />
                         <span className="font-bold text-white">{cargoLabel(m.cargo)}</span>
@@ -367,7 +362,11 @@ export default function PoliticoPage() {
                           {m.anoInicio}{m.anoFim ? `–${m.anoFim}` : '–presente'}
                         </span>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="border-b border-[#1a1a1a] p-4 text-sm font-medium text-white/35">
+                        Nenhum mandato público anterior identificado nas bases integradas.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -377,7 +376,7 @@ export default function PoliticoPage() {
             {activeTab === 'condenacoes' && (
               <div>
                 {condenacoes.length === 0 ? (
-                  <EmptyState message="Nenhuma condenação encontrada para este político." />
+                  <EmptyState message="Nenhuma condenação integrada para este perfil. Quando não houver base oficial conectada, o site não exibe exemplo fictício." />
                 ) : (
                   <div className="space-y-3">
                     {condenacoes.map((c) => (
@@ -465,7 +464,7 @@ export default function PoliticoPage() {
                 )}
 
                 {gastosResumo.length === 0 && gastosMes.length === 0 && (
-                  <EmptyState message="Nenhum dado de gasto disponível." />
+                  <EmptyState message="Nenhum gasto consolidado para este perfil nas bases integradas. Para presidente e governador, os dados vêm de bases diferentes da CEAP." />
                 )}
               </div>
             )}
@@ -532,7 +531,7 @@ export default function PoliticoPage() {
                   </div>
                 )}
                 {discursos.length === 0 && comparacoes.length === 0 && (
-                  <EmptyState message="Nenhum discurso disponível para este político." />
+                  <EmptyState message="Nenhum discurso ou promessa consolidado para este perfil. O site não usa discurso de exemplo em perfis reais." />
                 )}
               </div>
             )}
@@ -756,151 +755,3 @@ function CondenacaoCard({ condenacao: c }: { condenacao: Condenacao }) {
     </div>
   )
 }
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
-
-const MOCK_CONDENACOES: Condenacao[] = [
-  {
-    id: 1,
-    politicoId: 1,
-    orgao: 'TCU',
-    tipo: 'administrativa',
-    descricao: 'Irregularidades na prestação de contas de convênio firmado com o Ministério da Saúde, com desvio de finalidade de recursos públicos.',
-    dataDecisao: '2021-08-15',
-    dataTransitoJulgado: '2022-01-10',
-    status: 'transitada_julgado',
-    pena: 'Multa de R$ 50.000 e inabilitação por 5 anos',
-    processo: 'TC 020.123/2020-5',
-    urlDecisao: 'https://portal.tcu.gov.br',
-  },
-  {
-    id: 2,
-    politicoId: 1,
-    orgao: 'TRE-SP',
-    tipo: 'eleitoral',
-    descricao: 'Abuso de poder econômico em campanha eleitoral de 2018, com uso de recursos não declarados à Justiça Eleitoral.',
-    dataDecisao: '2019-03-22',
-    status: 'em_recurso',
-    processo: 'RESPE 0600123-45.2018.6.26.0000',
-  },
-]
-
-const MOCK_GASTOS_RESUMO: GastoResumido[] = [
-  { tipoDespesa: 'Divulgação da atividade parlamentar', total: 48000, quantidade: 12, percentual: 40 },
-  { tipoDespesa: 'Passagens aéreas', total: 24000, quantidade: 48, percentual: 20 },
-  { tipoDespesa: 'Hospedagem', total: 18000, quantidade: 36, percentual: 15 },
-  { tipoDespesa: 'Combustíveis e lubrificantes', total: 14400, quantidade: 24, percentual: 12 },
-  { tipoDespesa: 'Telefonia', total: 9600, quantidade: 12, percentual: 8 },
-  { tipoDespesa: 'Serviços postais', total: 6000, quantidade: 24, percentual: 5 },
-]
-
-const MOCK_GASTOS_MES: GastosPorMes[] = [
-  { ano: 2024, mes: 1, total: 8500 },
-  { ano: 2024, mes: 2, total: 11200 },
-  { ano: 2024, mes: 3, total: 9800 },
-  { ano: 2024, mes: 4, total: 13400 },
-  { ano: 2024, mes: 5, total: 10100 },
-  { ano: 2024, mes: 6, total: 15600 },
-  { ano: 2024, mes: 7, total: 12300 },
-  { ano: 2024, mes: 8, total: 11900 },
-  { ano: 2024, mes: 9, total: 14200 },
-  { ano: 2024, mes: 10, total: 9600 },
-  { ano: 2024, mes: 11, total: 8900 },
-  { ano: 2024, mes: 12, total: 14500 },
-]
-
-const MOCK_DISCURSOS: Discurso[] = [
-  {
-    id: 1,
-    politicoId: 1,
-    dataHoraInicio: '2024-06-10T14:30:00',
-    sumario: 'O deputado discutiu a necessidade de aumentar o orçamento para a educação pública, defendendo a destinação de 30% das receitas de royalties do petróleo para o setor.',
-    keywords: ['educação', 'royalties', 'orçamento', 'escola pública'],
-    faseEvento: 'Pequeno Expediente',
-    tipoDiscurso: 'DISCURSO',
-    urlTexto: 'https://dadosabertos.camara.leg.br',
-  },
-  {
-    id: 2,
-    politicoId: 1,
-    dataHoraInicio: '2024-05-22T10:00:00',
-    sumario: 'Em plenário, o parlamentar votou contra o projeto de privatização da Petrobras, argumentando que a empresa é estratégica para a soberania nacional e para o desenvolvimento tecnológico do Brasil.',
-    keywords: ['petrobras', 'privatização', 'soberania', 'energia'],
-    faseEvento: 'Ordem do Dia',
-    tipoDiscurso: 'DISCURSO',
-  },
-  {
-    id: 3,
-    politicoId: 1,
-    dataHoraInicio: '2024-04-15T16:45:00',
-    sumario: 'O deputado apresentou emenda ao orçamento para reduzir gastos com saúde pública em R$ 200 milhões, redirecionando os recursos para obras de infraestrutura no seu estado.',
-    keywords: ['saúde', 'orçamento', 'emenda', 'infraestrutura'],
-    faseEvento: 'Comissão de Orçamento',
-    tipoDiscurso: 'DISCURSO',
-  },
-]
-
-const MOCK_PROMESSAS = [
-  {
-    id: 1,
-    politicoId: 1,
-    descricao: 'Vou lutar para que 30% dos royalties do petróleo sejam destinados à educação pública brasileira.',
-    fonte: 'debate',
-    dataPromessa: '2022-09-15',
-    tema: 'educação',
-    cumprida: null,
-  },
-  {
-    id: 2,
-    politicoId: 1,
-    descricao: 'Defenderemos ampliar o investimento em saúde pública e nunca votarei por cortes no SUS.',
-    fonte: 'programa_de_governo',
-    dataPromessa: '2022-08-01',
-    tema: 'saúde',
-    cumprida: null,
-  },
-]
-
-const MOCK_GASTOS_ITENS: Gasto[] = [
-  { id: 1, politicoId: 1, ano: 2024, mes: 6, tipoDespesa: 'Divulgação da atividade parlamentar', cnpjCpfFornecedor: '12.345.678/0001-99', nomeFornecedor: 'Gráfica Comunicação Total Ltda', numDocumento: 'NF-002341', valorDocumento: 18500, valorLiquido: 18500, urlDocumento: 'https://dadosabertos.camara.leg.br' },
-  { id: 2, politicoId: 1, ano: 2024, mes: 5, tipoDespesa: 'Passagens aéreas', cnpjCpfFornecedor: '07.575.651/0001-59', nomeFornecedor: 'LATAM Airlines Brasil S.A.', numDocumento: 'ETK-9982341', valorDocumento: 4200, valorLiquido: 4200 },
-  { id: 3, politicoId: 1, ano: 2024, mes: 5, tipoDespesa: 'Hospedagem', cnpjCpfFornecedor: '45.981.060/0001-03', nomeFornecedor: 'Hotel Nacional Brasília', numDocumento: 'REC-00521', valorDocumento: 3800, valorLiquido: 3800 },
-  { id: 4, politicoId: 1, ano: 2024, mes: 4, tipoDespesa: 'Combustíveis e lubrificantes', cnpjCpfFornecedor: '89.237.654/0001-12', nomeFornecedor: 'Posto Alvorada Combustíveis', numDocumento: 'CUP-4412', valorDocumento: 1250, valorLiquido: 1250 },
-  { id: 5, politicoId: 1, ano: 2024, mes: 4, tipoDespesa: 'Divulgação da atividade parlamentar', cnpjCpfFornecedor: '98.321.456/0001-77', nomeFornecedor: 'Agência Digital Planalto ME', numDocumento: 'NF-001188', valorDocumento: 12000, valorLiquido: 12000, urlDocumento: 'https://dadosabertos.camara.leg.br' },
-  { id: 6, politicoId: 1, ano: 2024, mes: 3, tipoDespesa: 'Telefonia', cnpjCpfFornecedor: '02.558.157/0001-62', nomeFornecedor: 'Claro S.A.', numDocumento: 'FAT-2024031', valorDocumento: 890, valorLiquido: 890 },
-  { id: 7, politicoId: 1, ano: 2024, mes: 3, tipoDespesa: 'Alimentação', cnpjCpfFornecedor: '31.456.789/0001-44', nomeFornecedor: 'Restaurante Executivo Central', numDocumento: 'NF-00887', valorDocumento: 2100, valorLiquido: 2100 },
-  { id: 8, politicoId: 1, ano: 2024, mes: 2, tipoDespesa: 'Passagens aéreas', cnpjCpfFornecedor: '07.575.651/0001-59', nomeFornecedor: 'LATAM Airlines Brasil S.A.', numDocumento: 'ETK-8871234', valorDocumento: 5600, valorLiquido: 5600 },
-  { id: 9, politicoId: 1, ano: 2024, mes: 2, tipoDespesa: 'Serviços postais', cnpjCpfFornecedor: '34.028.316/0001-03', nomeFornecedor: 'Empresa Brasileira de Correios e Telégrafos', numDocumento: 'REC-220241', valorDocumento: 430, valorLiquido: 430 },
-  { id: 10, politicoId: 1, ano: 2024, mes: 1, tipoDespesa: 'Locação de veículos', cnpjCpfFornecedor: '05.423.963/0001-11', nomeFornecedor: 'Localiza Rent a Car S.A.', numDocumento: 'NF-041122', valorDocumento: 3200, valorLiquido: 3200 },
-  { id: 11, politicoId: 1, ano: 2024, mes: 1, tipoDespesa: 'Divulgação da atividade parlamentar', cnpjCpfFornecedor: '12.345.678/0001-99', nomeFornecedor: 'Gráfica Comunicação Total Ltda', numDocumento: 'NF-001998', valorDocumento: 9800, valorLiquido: 9800 },
-  { id: 12, politicoId: 1, ano: 2023, mes: 12, tipoDespesa: 'Hospedagem', cnpjCpfFornecedor: '78.234.123/0001-55', nomeFornecedor: 'Bristol Brasil Hotéis', numDocumento: 'REC-00341', valorDocumento: 2900, valorLiquido: 2900 },
-]
-
-const MOCK_COMPARACOES: ComparacaoResult[] = [
-  {
-    promessa: MOCK_PROMESSAS[0] as any,
-    discursos_relacionados: [
-      {
-        discurso: MOCK_DISCURSOS[0],
-        similaridade: 0.89,
-        tipo: 'confirmacao',
-        trecho_destacado: 'necessidade de aumentar o orçamento para a educação pública, defendendo a destinação de 30% das receitas de royalties do petróleo para o setor',
-      },
-    ],
-    score_geral: 0.89,
-    veredicto: 'cumprida',
-  },
-  {
-    promessa: MOCK_PROMESSAS[1] as any,
-    discursos_relacionados: [
-      {
-        discurso: MOCK_DISCURSOS[2],
-        similaridade: 0.18,
-        tipo: 'contradicao',
-        trecho_destacado: 'emenda ao orçamento para reduzir gastos com saúde pública em R$ 200 milhões',
-      },
-    ],
-    score_geral: 0.18,
-    veredicto: 'contradita',
-  },
-]

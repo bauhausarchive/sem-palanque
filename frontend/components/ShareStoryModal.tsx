@@ -23,6 +23,7 @@ function getScoreLabel(score: number): string {
 }
 
 function getStatusBadge(politico: Politico): { text: string; bg: string; textColor: string } {
+  if (politico.score_disponivel === false) return { text: 'PRÉ-CANDIDATO 2026', bg: '#1a1a1a', textColor: '#fff' }
   if (politico.total_condenacoes > 0) return { text: 'CONDENADO', bg: '#FF2020', textColor: '#fff' }
   if (politico.score_transparencia >= 70) return { text: 'FICHA LIMPA', bg: '#1A6BFF', textColor: '#fff' }
   return { text: 'INVESTIGADO', bg: '#FFE500', textColor: '#000' }
@@ -143,18 +144,12 @@ function Slide1({ politico, badge }: { politico: Politico; badge: ReturnType<typ
   )
 }
 
-// Mock conviction data for slide 2
-const MOCK_CONVICTIONS = [
-  { orgao: 'TCU', ano: '2022', descricao: 'Irregularidades na prestação de contas de convênio', status: 'TRÂNSITO EM JULGADO' },
-  { orgao: 'TRE-SP', ano: '2019', descricao: 'Abuso de poder econômico em campanha eleitoral', status: 'EM RECURSO' },
-]
-
 // Slide 2 — Score de Integridade
 function Slide2({ politico }: { politico: Politico }) {
   const score = politico.score_transparencia
-  const scoreColor = getScoreColor(score)
-  const scoreLabel = getScoreLabel(score)
-  const convictions = MOCK_CONVICTIONS.slice(0, politico.total_condenacoes || 0)
+  const hasScore = politico.score_disponivel !== false
+  const scoreColor = hasScore ? getScoreColor(score) : '#ffffff40'
+  const scoreLabel = hasScore ? getScoreLabel(score) : 'DADOS EM CONSOLIDAÇÃO'
 
   return (
     <div style={{ width: 390, height: 693, background: '#0a0a0a', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -175,13 +170,13 @@ function Slide2({ politico }: { politico: Politico }) {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 96, fontWeight: 900, lineHeight: 1, color: '#FF2020', fontFamily: "'Space Grotesk', sans-serif" }}>{score}</div>
+          <div style={{ fontSize: 96, fontWeight: 900, lineHeight: 1, color: '#FF2020', fontFamily: "'Space Grotesk', sans-serif" }}>{hasScore ? score : '—'}</div>
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: "'Space Grotesk', sans-serif", marginTop: 2 }}>DE 100</div>
         </div>
 
         {/* Progress bar */}
         <div style={{ height: 6, background: '#1a1a1a', margin: '14px 0 8px' }}>
-          <div style={{ height: '100%', width: `${score}%`, background: scoreColor }} />
+          <div style={{ height: '100%', width: `${hasScore ? score : 0}%`, background: scoreColor }} />
         </div>
         <div style={{ textAlign: 'center', fontSize: 11, fontWeight: 900, color: scoreColor, letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: "'Space Grotesk', sans-serif" }}>
           {scoreLabel}
@@ -194,22 +189,17 @@ function Slide2({ politico }: { politico: Politico }) {
           </div>
         )}
 
-        {/* Conviction list */}
-        {convictions.length > 0 && (
-          <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {convictions.map((c, i) => (
-              <div key={i} style={{ borderLeft: '3px solid #FF2020', paddingLeft: 10 }}>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontFamily: "'Space Grotesk', sans-serif', letterSpacing: '0.1em", textTransform: 'uppercase' }}>
-                  {c.orgao} · {c.ano}
-                </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', fontFamily: "'Space Grotesk', sans-serif", marginTop: 2 }}>
-                  {c.descricao}
-                </div>
-                <div style={{ display: 'inline-block', background: '#FF2020', color: '#fff', fontSize: 8, fontWeight: 900, letterSpacing: '0.15em', padding: '2px 6px', marginTop: 4, textTransform: 'uppercase', fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {c.status}
-                </div>
-              </div>
-            ))}
+        {politico.total_condenacoes > 0 ? (
+          <div style={{ marginTop: 12, borderLeft: '3px solid #FF2020', paddingLeft: 10 }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', lineHeight: 1.4 }}>
+              Condenações encontradas em bases oficiais integradas. Detalhes completos no perfil.
+            </div>
+          </div>
+        ) : (
+          <div style={{ marginTop: 20, border: '1px dashed rgba(255,255,255,0.12)', padding: 14 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
+              Nenhuma condenação integrada neste protótipo. O Sem Palanque não usa condenações de exemplo.
+            </div>
           </div>
         )}
       </div>
@@ -219,22 +209,11 @@ function Slide2({ politico }: { politico: Politico }) {
   )
 }
 
-// Mock monthly data for slide 3
-const MOCK_MONTHLY = [8500, 11200, 9800, 13400, 10100, 15600, 12300, 11900, 14200, 9600, 8900, 14500]
-const MES_SHORT = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
-
-// Mock top categories
-const MOCK_CATS = [
-  { label: 'Divulgação parlamentar', value: 48000, pct: 40 },
-  { label: 'Passagens aéreas', value: 24000, pct: 20 },
-  { label: 'Hospedagem', value: 18000, pct: 15 },
-]
-
 // Slide 3 — Gastos
 function Slide3({ politico }: { politico: Politico }) {
   const total = politico.total_gastos_ceap
-  const maxVal = Math.max(...MOCK_MONTHLY)
   const totalFormatted = total >= 1000 ? `R$ ${(total / 1000).toFixed(0)}k` : formatCurrency(total)
+  const hasGastos = total > 0
 
   return (
     <div style={{ width: 390, height: 693, background: '#000', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -254,36 +233,28 @@ function Slide3({ politico }: { politico: Politico }) {
 
         {/* Total */}
         <div style={{ fontSize: 64, fontWeight: 900, lineHeight: 1, color: '#1A6BFF', fontFamily: "'Space Grotesk', sans-serif" }}>
-          {totalFormatted}
+          {hasGastos ? totalFormatted : '—'}
         </div>
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: "'Space Grotesk', sans-serif", marginTop: 4 }}>
           VERBA PÚBLICA
         </div>
 
-        {/* Bar chart — 12 monthly inline divs */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 80, marginTop: 20 }}>
-          {MOCK_MONTHLY.map((val, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-              <div style={{ width: '100%', height: Math.round((val / maxVal) * 64), background: '#1A6BFF' }} />
-              <div style={{ fontSize: 7, color: 'rgba(255,255,255,0.3)', marginTop: 3, fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700 }}>{MES_SHORT[i]}</div>
+        {hasGastos ? (
+          <div style={{ marginTop: 24, border: '1px solid rgba(26,107,255,0.25)', padding: 14 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>
+              Detalhamento por mês e categoria disponível no perfil.
             </div>
-          ))}
-        </div>
-
-        {/* Top categories */}
-        <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {MOCK_CATS.map((cat, i) => (
-            <div key={i}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontFamily: "'Space Grotesk', sans-serif" }}>{cat.label}</span>
-                <span style={{ fontSize: 10, fontWeight: 900, color: '#1A6BFF', fontFamily: "'Space Grotesk', sans-serif" }}>R$ {(cat.value / 1000).toFixed(0)}k</span>
-              </div>
-              <div style={{ height: 3, background: '#1a1a1a' }}>
-                <div style={{ height: '100%', width: `${cat.pct}%`, background: '#1A6BFF' }} />
-              </div>
+          </div>
+        ) : (
+          <div style={{ marginTop: 24, border: '1px dashed rgba(255,255,255,0.12)', padding: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 900, color: '#1A6BFF', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
+              Base pendente
             </div>
-          ))}
-        </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+              {politico.fonte_gastos ? `Fonte prevista: ${politico.fonte_gastos}.` : 'Gastos ainda não consolidados nas bases integradas.'}
+            </div>
+          </div>
+        )}
       </div>
 
       <BottomBar bg="#1A6BFF" />
@@ -291,18 +262,10 @@ function Slide3({ politico }: { politico: Politico }) {
   )
 }
 
-// Mock promises for slide 4
-const MOCK_PROMISES = [
-  { text: '30% dos royalties do petróleo para educação pública', status: 'cumprida' as const },
-  { text: 'Nunca votarei por cortes no SUS', status: 'contradita' as const },
-]
-
 // Slide 4 — Promessas vs Discursos
 function Slide4({ politico }: { politico: Politico }) {
-  const cumpridas = MOCK_PROMISES.filter(p => p.status === 'cumprida').length
-  const contraditas = MOCK_PROMISES.filter(p => p.status === 'contradita').length
-  const total = MOCK_PROMISES.length
-  const pct = total > 0 ? Math.round((cumpridas / total) * 100) : 0
+  const cumpridas: number = 0
+  const contraditas: number = 0
 
   return (
     <div style={{ width: 390, height: 693, background: '#0a0a0a', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -322,7 +285,7 @@ function Slide4({ politico }: { politico: Politico }) {
 
         {/* Percentage */}
         <div style={{ fontSize: 96, fontWeight: 900, lineHeight: 1, color: '#FFE500', fontFamily: "'Space Grotesk', sans-serif", marginTop: 12 }}>
-          {pct}%
+          —
         </div>
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: "'Space Grotesk', sans-serif", marginTop: 2 }}>
           DE COERÊNCIA
@@ -340,16 +303,10 @@ function Slide4({ politico }: { politico: Politico }) {
           </div>
         </div>
 
-        {/* Promise list */}
-        <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {MOCK_PROMISES.map((p, i) => (
-            <div key={i} style={{ borderLeft: `3px solid ${p.status === 'cumprida' ? '#22c55e' : '#FF2020'}`, paddingLeft: 10 }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1.4 }}>{p.text}</div>
-              <div style={{ display: 'inline-block', background: p.status === 'cumprida' ? '#22c55e' : '#FF2020', color: p.status === 'cumprida' ? '#000' : '#fff', fontSize: 8, fontWeight: 900, letterSpacing: '0.15em', padding: '2px 6px', marginTop: 4, textTransform: 'uppercase', fontFamily: "'Space Grotesk', sans-serif" }}>
-                {p.status === 'cumprida' ? 'CUMPRIDA' : 'CONTRADITA'}
-              </div>
-            </div>
-          ))}
+        <div style={{ marginTop: 20, border: '1px dashed rgba(255,255,255,0.12)', padding: 14 }}>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+            Comparação automática pendente. O card final só exibe promessas e discursos quando houver transcrição ou fonte oficial conectada.
+          </div>
         </div>
       </div>
 
