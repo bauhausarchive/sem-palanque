@@ -35,6 +35,15 @@ export default function RootLayout({
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            var redirect = sessionStorage.getItem('redirect');
+            if (redirect && redirect !== '/') {
+              sessionStorage.removeItem('redirect');
+              window.history.replaceState(null, null, '/sem-palanque' + redirect);
+            }
+          })();
+        `}} />
       </head>
       <body className={`${spaceGrotesk.variable} ${dmSans.variable} min-h-screen bg-black text-white`}
         style={{ fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif' }}>

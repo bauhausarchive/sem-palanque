@@ -6,9 +6,9 @@
 import PoliticoPageClient from './PoliticoPageClient'
 
 export function generateStaticParams() {
-  // Next.js static export requires at least one entry for catch-all routes.
-  // We return a placeholder; the client component handles any real ID dynamically.
-  return [{ slug: ['__'] }]
+  // Pre-generate pages for all known politician IDs
+  const ids = ['1', '2', '3', '4', '5', '6']
+  return ids.map((id) => ({ slug: [id] }))
 }
 
 export default function PoliticoPage() {
