@@ -155,7 +155,7 @@ export default function SearchBar({
           className={cn(
             'w-full border-2 border-white bg-black py-4 pl-12 pr-12 text-sm font-medium text-white',
             'placeholder:text-white/30',
-            'focus:outline-none focus:border-[#FFE500]',
+            'focus:outline-none focus:border-[#A3A3A3]',
             'transition-colors'
           )}
           aria-label="Buscar político"

@@ -77,7 +77,7 @@ export default function HomePage() {
           >
             Os candidatos como eles são.
           </p>
-          <p className="mb-10 max-w-xl text-sm font-medium text-[#FFE500]">
+          <p className="mb-10 max-w-xl text-sm font-medium text-[#FF2020]">
             Condenações, gastos do mandato e coerência de discurso.<br />
             Tudo com dados abertos do governo federal.
           </p>
