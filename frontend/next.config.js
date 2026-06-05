@@ -4,7 +4,8 @@ const nextConfig = {
   trailingSlash: true,
   // Set basePath to your GitHub Pages repo name, e.g. '/politico-transparente'
   // Leave empty for custom domain or root deployment
-  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
+  basePath: '/sem-palanque',
+  assetPrefix: '/sem-palanque',
   images: {
     unoptimized: true,
   },
