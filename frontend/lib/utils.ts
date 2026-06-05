@@ -44,9 +44,6 @@ export function cargoLabel(cargo: string): string {
     PREFEITO: 'Prefeito',
     VEREADOR: 'Vereador',
     DEPUTADO_ESTADUAL: 'Deputado Estadual',
-    PRESIDENTE: 'Presidente',
-    MINISTRO: 'Ministro',
-    PRE_CANDIDATO_PRESIDENCIAL: 'Pré-candidato 2026',
   }
   return labels[cargo] ?? cargo
 }

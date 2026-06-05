@@ -8,14 +8,12 @@ interface PoliticoCardProps {
 }
 
 function getAccentColor(politico: PoliticoSearchResult): string {
-  if (politico.score_disponivel === false) return '#ffffff40'
   if (politico.total_condenacoes > 0) return '#FF2020'
   if (politico.score_transparencia >= 70) return '#1A6BFF'
   return '#FFE500'
 }
 
 function getStatusLabel(politico: PoliticoSearchResult): { text: string; bg: string; textColor: string } {
-  if (politico.score_disponivel === false) return { text: 'PRÉ-CANDIDATO', bg: '#1a1a1a', textColor: '#fff' }
   if (politico.total_condenacoes > 0) return { text: 'CONDENADO', bg: '#FF2020', textColor: '#fff' }
   if (politico.score_transparencia >= 70) return { text: 'FICHA LIMPA', bg: '#1A6BFF', textColor: '#fff' }
   return { text: 'INVESTIGADO', bg: '#FFE500', textColor: '#000' }
@@ -64,14 +62,14 @@ export default function PoliticoCard({ politico, className }: PoliticoCardProps)
             {siglaUf}
           </span>
           <span className="px-2 py-0.5 bg-[#1a1a1a] text-xs font-black uppercase tracking-widest text-white/50">
-            {cargoLabel(cargo)}
+            {cargo === 'DEPUTADO_FEDERAL' ? 'Dep. Federal' : cargoLabel(cargo)}
           </span>
         </div>
 
         {/* Score bar */}
         <div>
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-widest text-white/40">Integridade</span>
+            <span className="text-xs font-black uppercase tracking-widest text-white/40">Transparência</span>
             <span
               className="text-2xl font-black tracking-tighter leading-none"
               style={{
@@ -79,13 +77,13 @@ export default function PoliticoCard({ politico, className }: PoliticoCardProps)
                 color: accentColor,
               }}
             >
-              {politico.score_disponivel === false ? '—' : score_transparencia}
+              {score_transparencia}
             </span>
           </div>
           <div className="h-1 w-full bg-[#1a1a1a]">
             <div
               className="h-full transition-all"
-              style={{ width: `${politico.score_disponivel === false ? 0 : score_transparencia}%`, background: accentColor }}
+              style={{ width: `${score_transparencia}%`, background: accentColor }}
             />
           </div>
         </div>
@@ -95,10 +93,6 @@ export default function PoliticoCard({ politico, className }: PoliticoCardProps)
           {total_condenacoes > 0 ? (
             <span className="text-xs font-black uppercase tracking-widest text-[#FF2020]">
               {total_condenacoes} {total_condenacoes === 1 ? 'condenação' : 'condenações'}
-            </span>
-          ) : politico.score_disponivel === false ? (
-            <span className="text-xs font-black uppercase tracking-widest text-white/30">
-              Dados em consolidação
             </span>
           ) : (
             <span className="text-xs font-black uppercase tracking-widest text-[#1A6BFF]">

@@ -5,7 +5,32 @@ import { useRouter } from 'next/navigation'
 import { Search, Loader2, X } from 'lucide-react'
 import { searchPoliticos } from '@/lib/api'
 import type { PoliticoSearchResult } from '@/lib/types'
-import { searchStaticPoliticos } from '@/lib/static-politicos'
+
+let deputadosCache: PoliticoSearchResult[] | null = null
+
+async function loadDeputados(): Promise<PoliticoSearchResult[]> {
+  if (deputadosCache) return deputadosCache
+  try {
+    let res = await fetch('/sem-palanque/data/deputados.json')
+    if (!res.ok) res = await fetch('/data/deputados.json')
+    const data = await res.json()
+    deputadosCache = data as PoliticoSearchResult[]
+    return deputadosCache
+  } catch {
+    return []
+  }
+}
+
+async function searchMock(query: string): Promise<PoliticoSearchResult[]> {
+  const list = await loadDeputados()
+  const q = query.toLowerCase()
+  return list.filter(
+    (p) =>
+      p.nome.toLowerCase().includes(q) ||
+      p.partido.toLowerCase().includes(q) ||
+      p.siglaUf.toLowerCase().includes(q)
+  ).slice(0, 20)
+}
 import { cn } from '@/lib/utils'
 
 interface SearchBarProps {
@@ -62,11 +87,11 @@ export default function SearchBar({
       setLoading(true)
       try {
         const res = await searchPoliticos(val).catch(() => null)
-        const data = res?.data ?? await searchStaticPoliticos(val)
+        const data = res?.data ?? await searchMock(val)
         setResults(data)
         setOpen(true)
       } catch {
-        setResults(await searchStaticPoliticos(val))
+        setResults(await searchMock(val))
         setOpen(true)
       } finally {
         setLoading(false)
@@ -178,7 +203,7 @@ export default function SearchBar({
               <div className="flex-1 min-w-0">
                 <p className="font-bold truncate">{p.nome}</p>
                 <p className={cn('text-xs', i === activeIndex ? 'text-black/50' : 'text-white/40')}>
-                  {p.cargo === 'DEPUTADO_FEDERAL' ? 'Dep. Federal' : p.cargo === 'PRE_CANDIDATO_PRESIDENCIAL' ? 'Pré-candidato 2026' : p.cargo} · {p.partido}/{p.siglaUf}
+                  {p.cargo === 'DEPUTADO_FEDERAL' ? 'Dep. Federal' : p.cargo} · {p.partido}/{p.siglaUf}
                 </p>
               </div>
               {p.total_condenacoes > 0 && (
