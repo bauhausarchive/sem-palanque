@@ -83,6 +83,7 @@ export async function compararDiscursos(payload: {
   politico_id: number
   promessas: string[]
   discursos_ids?: number[]
+  youtube_links?: string[]
 }): Promise<ComparacaoResult[]> {
   return fetchApi<ComparacaoResult[]>('/discursos/comparar', {
     method: 'POST',
