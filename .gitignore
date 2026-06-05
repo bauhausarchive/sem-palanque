@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/.vercel
+
+# Python
+backend/__pycache__/
+backend/*.pyc
+backend/.venv/
+backend/venv/
+*.egg-info/
+dist/
+build/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Claude
+.claude/
