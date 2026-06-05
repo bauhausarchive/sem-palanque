@@ -46,13 +46,13 @@ export function GastoBarChart({ data }: GastoBarChartProps) {
           <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 11, fill: '#ffffff40', fontWeight: 700, fontFamily: 'DM Sans' }}
+            tick={{ fontSize: 11, fill: '#ffffff40', fontWeight: 700, fontFamily: "'Space Grotesk', 'DM Sans', sans-serif" }}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-            tick={{ fontSize: 11, fill: '#ffffff40', fontWeight: 700, fontFamily: 'DM Sans' }}
+            tick={{ fontSize: 11, fill: '#ffffff40', fontWeight: 700, fontFamily: "'Space Grotesk', 'DM Sans', sans-serif" }}
             tickLine={false}
             axisLine={false}
             width={60}
@@ -65,7 +65,7 @@ export function GastoBarChart({ data }: GastoBarChartProps) {
               background: '#0a0a0a',
               color: '#fff',
               fontSize: 12,
-              fontFamily: 'DM Sans',
+              fontFamily: "'Space Grotesk', 'DM Sans', sans-serif",
             }}
           />
           <Bar dataKey="total" fill="#FF2020" radius={0} maxBarSize={36} />
@@ -109,13 +109,13 @@ export function GastoPieChart({ data }: GastoPieChartProps) {
               background: '#0a0a0a',
               color: '#fff',
               fontSize: 12,
-              fontFamily: 'DM Sans',
+              fontFamily: "'Space Grotesk', 'DM Sans', sans-serif",
             }}
           />
           <Legend
             iconType="square"
             iconSize={8}
-            wrapperStyle={{ fontSize: 11, paddingTop: 12, color: '#ffffff80', fontFamily: 'DM Sans' }}
+            wrapperStyle={{ fontSize: 11, paddingTop: 12, color: '#ffffff80', fontFamily: "'Space Grotesk', 'DM Sans', sans-serif" }}
             formatter={(value) => (value.length > 30 ? value.substring(0, 30) + '…' : value)}
           />
         </PieChart>
