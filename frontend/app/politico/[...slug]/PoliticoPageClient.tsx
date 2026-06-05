@@ -46,7 +46,7 @@ type Tab = 'resumo' | 'condenacoes' | 'gastos' | 'discursos'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'resumo', label: 'Resumo' },
   { id: 'condenacoes', label: 'Condenações' },
-  { id: 'gastos', label: 'Gastos CEAP' },
+  { id: 'gastos', label: 'Gastos' },
   { id: 'discursos', label: 'Discursos' },
 ]
 
@@ -92,6 +92,7 @@ export default function PoliticoPage() {
           siglaUf: 'SP',
           cargo: 'DEPUTADO_FEDERAL',
           legislaturaAtual: 57,
+          urlFoto: 'https://www.camara.leg.br/internet/deputado/bandep/204379.jpg',
           score_transparencia: 35,
           total_condenacoes: 2,
           total_processos: 5,
@@ -181,9 +182,46 @@ export default function PoliticoPage() {
       {/* Profile header */}
       <div className="border-b border-[#1a1a1a] bg-[#0a0a0a] mt-6">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col gap-6">
-            {/* Name row */}
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            {/* Left: photo + info row */}
+            <div className="flex items-center gap-6">
+              {/* Photo */}
+              <div className="flex-shrink-0">
+                {politico.urlFoto ? (
+                  <img
+                    src={politico.urlFoto}
+                    alt={politico.nome}
+                    style={{
+                      width: 96,
+                      height: 96,
+                      objectFit: 'cover',
+                      objectPosition: 'top',
+                      filter: 'grayscale(100%) contrast(1.1)',
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 96,
+                      height: 96,
+                      flexShrink: 0,
+                      background: 'linear-gradient(160deg, #FF2020 0%, #7a0000 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: 40,
+                      fontWeight: 900,
+                      color: 'rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    {politico.nome.charAt(0)}
+                  </div>
+                )}
+              </div>
+
+              {/* Right content: badges, name, civil name */}
               <div>
                 <div className="flex items-center gap-3 flex-wrap mb-2">
                   <span
@@ -220,33 +258,33 @@ export default function PoliticoPage() {
                   Compartilhar
                 </button>
               </div>
+            </div>
 
-              {/* Score block + share button (desktop) */}
-              <div className="flex-shrink-0 flex flex-col gap-3">
-                <button
-                  onClick={() => setShowStoryModal(true)}
-                  className="hidden sm:flex items-center justify-center gap-2 border-2 border-white bg-black px-4 py-2 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-black"
+            {/* Score block + share button (desktop) */}
+            <div className="flex-shrink-0 flex flex-col gap-3">
+              <button
+                onClick={() => setShowStoryModal(true)}
+                className="hidden sm:flex items-center justify-center gap-2 border-2 border-white bg-black px-4 py-2 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-black"
+              >
+                <Share2 className="h-4 w-4" />
+                Compartilhar
+              </button>
+              <div className="border border-[#1a1a1a] p-5 min-w-[160px]">
+                <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Transparência</p>
+                <div
+                  className="text-7xl font-black leading-none tracking-tighter"
+                  style={{
+                    fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif',
+                    color: scoreColor,
+                  }}
                 >
-                  <Share2 className="h-4 w-4" />
-                  Compartilhar
-                </button>
-                <div className="border border-[#1a1a1a] p-5 min-w-[160px]">
-                  <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">Transparência</p>
+                  {politico.score_transparencia}
+                </div>
+                <div className="mt-3 h-2 w-full bg-[#1a1a1a]">
                   <div
-                    className="text-7xl font-black leading-none tracking-tighter"
-                    style={{
-                      fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif',
-                      color: scoreColor,
-                    }}
-                  >
-                    {politico.score_transparencia}
-                  </div>
-                  <div className="mt-3 h-2 w-full bg-[#1a1a1a]">
-                    <div
-                      className="h-full"
-                      style={{ width: `${politico.score_transparencia}%`, background: scoreColor }}
-                    />
-                  </div>
+                    className="h-full"
+                    style={{ width: `${politico.score_transparencia}%`, background: scoreColor }}
+                  />
                 </div>
               </div>
             </div>

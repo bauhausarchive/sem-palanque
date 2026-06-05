@@ -6,23 +6,30 @@ import { Search, Loader2, X } from 'lucide-react'
 import { searchPoliticos } from '@/lib/api'
 import type { PoliticoSearchResult } from '@/lib/types'
 
-const MOCK_POLITICOS: PoliticoSearchResult[] = [
-  { id: 1, nome: 'João da Silva', partido: 'PDT', siglaUf: 'SP', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 2, score_transparencia: 35 },
-  { id: 2, nome: 'Maria Oliveira', partido: 'MDB', siglaUf: 'MG', cargo: 'SENADOR', total_condenacoes: 0, score_transparencia: 82 },
-  { id: 3, nome: 'Carlos Mendes', partido: 'PT', siglaUf: 'RJ', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 1, score_transparencia: 54 },
-  { id: 4, nome: 'Ana Ferreira', partido: 'PSDB', siglaUf: 'RS', cargo: 'SENADOR', total_condenacoes: 0, score_transparencia: 91 },
-  { id: 5, nome: 'Paulo Souza', partido: 'PL', siglaUf: 'BA', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 3, score_transparencia: 18 },
-  { id: 6, nome: 'Beatriz Costa', partido: 'PSOL', siglaUf: 'CE', cargo: 'DEPUTADO_FEDERAL', total_condenacoes: 0, score_transparencia: 78 },
-]
+let deputadosCache: PoliticoSearchResult[] | null = null
 
-function searchMock(query: string): PoliticoSearchResult[] {
+async function loadDeputados(): Promise<PoliticoSearchResult[]> {
+  if (deputadosCache) return deputadosCache
+  try {
+    let res = await fetch('/sem-palanque/data/deputados.json')
+    if (!res.ok) res = await fetch('/data/deputados.json')
+    const data = await res.json()
+    deputadosCache = data as PoliticoSearchResult[]
+    return deputadosCache
+  } catch {
+    return []
+  }
+}
+
+async function searchMock(query: string): Promise<PoliticoSearchResult[]> {
+  const list = await loadDeputados()
   const q = query.toLowerCase()
-  return MOCK_POLITICOS.filter(
+  return list.filter(
     (p) =>
       p.nome.toLowerCase().includes(q) ||
       p.partido.toLowerCase().includes(q) ||
       p.siglaUf.toLowerCase().includes(q)
-  )
+  ).slice(0, 20)
 }
 import { cn } from '@/lib/utils'
 
@@ -80,11 +87,11 @@ export default function SearchBar({
       setLoading(true)
       try {
         const res = await searchPoliticos(val).catch(() => null)
-        const data = res?.data ?? searchMock(val)
+        const data = res?.data ?? await searchMock(val)
         setResults(data)
         setOpen(true)
       } catch {
-        setResults(searchMock(val))
+        setResults(await searchMock(val))
         setOpen(true)
       } finally {
         setLoading(false)

@@ -85,8 +85,8 @@ export function GastoPieChart({ data }: GastoPieChartProps) {
 
   return (
     <div className="bg-[#0a0a0a] border border-[#1a1a1a] p-4">
-      <ResponsiveContainer width="100%" height={320}>
-        <PieChart>
+      <ResponsiveContainer width="100%" height={380}>
+        <PieChart margin={{ bottom: 20 }}>
           <Pie
             data={top}
             cx="50%"
@@ -115,8 +115,8 @@ export function GastoPieChart({ data }: GastoPieChartProps) {
           <Legend
             iconType="square"
             iconSize={8}
-            wrapperStyle={{ fontSize: 11, paddingTop: 12, color: '#ffffff80', fontFamily: "'Space Grotesk', 'DM Sans', sans-serif" }}
-            formatter={(value) => (value.length > 30 ? value.substring(0, 30) + '…' : value)}
+            wrapperStyle={{ fontSize: 11, paddingTop: 16, lineHeight: '1.6', width: '100%', whiteSpace: 'normal', color: '#ffffff80', fontFamily: "'Space Grotesk', 'DM Sans', sans-serif" }}
+            formatter={(value) => value}
           />
         </PieChart>
       </ResponsiveContainer>

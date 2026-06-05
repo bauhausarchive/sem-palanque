@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEM PALANQUE — Mockup Foto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #111;
+      font-family: 'Space Grotesk', sans-serif;
+      color: #fff;
+      padding: 48px 24px;
+    }
+
+    .site-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .site-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .site-title span { color: #FF2020; }
+
+    .site-subtitle {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+      margin-top: 8px;
+    }
+
+    /* Section Labels */
+    .section {
+      max-width: 900px;
+      margin: 0 auto 56px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #222;
+    }
+
+    /* Shared badge styles */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-radius: 0;
+      line-height: 1.4;
+    }
+
+    .badge-condenado { background: #FF2020; color: #fff; }
+    .badge-party    { background: #1a1a1a; color: #fff; }
+    .badge-state    { background: #1a1a1a; color: #fff; }
+    .badge-ficha    { background: #1A6BFF; color: #fff; }
+
+    /* Progress bar */
+    .progress-bar-track {
+      width: 100%;
+      height: 4px;
+      background: #2a2a2a;
+      border-radius: 0;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 4px;
+      background: #FF2020;
+      border-radius: 0;
+      width: 35%;
+    }
+
+    /* Photo filter */
+    .politician-photo {
+      filter: grayscale(100%) contrast(1.1);
+      display: block;
+    }
+
+    /* =====================
+       OPTION A — Editorial
+       ===================== */
+    .card-a {
+      width: 100%;
+      max-width: 900px;
+      height: 320px;
+      background: #0a0a0a;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-a-photo-wrap {
+      position: relative;
+      width: 260px;
+      flex-shrink: 0;
+      height: 100%;
+    }
+
+    .card-a-photo-wrap::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #FF2020;
+      z-index: 2;
+    }
+
+    .card-a-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .card-a-content {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-a-top { display: flex; flex-direction: column; gap: 10px; }
+
+    .badges-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .role-text {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+      margin-left: 4px;
+    }
+
+    .politician-name {
+      font-size: 56px;
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .civil-name {
+      font-size: 13px;
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 0.5px;
+    }
+
+    .score-area {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+
+    .score-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .score-number-a {
+      font-size: 72px;
+      font-weight: 900;
+      color: #FF2020;
+      line-height: 1;
+    }
+
+    .score-details {
+      flex: 1;
+      padding-bottom: 10px;
+    }
+
+    .score-max {
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    /* =====================
+       OPTION B — Compact
+       ===================== */
+    .card-b {
+      width: 100%;
+      max-width: 900px;
+      background: #0a0a0a;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .card-b-photo {
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .card-b-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .politician-name-b {
+      font-size: 48px;
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .card-b-score {
+      flex-shrink: 0;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .score-label-b {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .score-number-b {
+      font-size: 56px;
+      font-weight: 900;
+      color: #FF2020;
+      line-height: 1;
+    }
+
+    .score-bar-b {
+      width: 80px;
+    }
+
+    /* =====================
+       OPTION C — Cinematic
+       ===================== */
+    .card-c {
+      width: 100%;
+      max-width: 900px;
+      height: 360px;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-c-photo {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      opacity: 0.35;
+    }
+
+    .card-c-gradient {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to right, rgba(0,0,0,0.95) 40%, rgba(0,0,0,0.3) 100%);
+    }
+
+    .card-c-content {
+      position: absolute;
+      left: 32px;
+      bottom: 32px;
+      right: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .politician-name-c {
+      font-size: 64px;
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .card-c-score {
+      position: absolute;
+      top: 32px;
+      right: 32px;
+      text-align: right;
+    }
+
+    .score-label-c {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      display: block;
+      margin-bottom: 0;
+    }
+
+    .score-number-c {
+      font-size: 80px;
+      font-weight: 900;
+      color: #FF2020;
+      line-height: 1;
+    }
+
+    /* Footer note */
+    .footer-note {
+      max-width: 900px;
+      margin: 48px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid #222;
+      font-size: 11px;
+      font-weight: 400;
+      color: #444;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    .footer-note code {
+      font-family: 'Space Grotesk', monospace;
+      color: #666;
+      background: #1a1a1a;
+      padding: 2px 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-title">SEM <span>PALANQUE</span></div>
+    <div class="site-subtitle">Mockup — Opções de layout para foto do político</div>
+  </header>
+
+  <!-- ===================== OPTION A ===================== -->
+  <div class="section">
+    <div class="section-label">Opção A — Editorial / Jornalístico</div>
+    <div class="card-a">
+      <div class="card-a-photo-wrap">
+        <img
+          class="politician-photo"
+          src="https://www.camara.leg.br/internet/deputado/bandep/204379.jpg"
+          alt="Foto do deputado"
+        >
+      </div>
+      <div class="card-a-content">
+        <div class="card-a-top">
+          <div class="badges-row">
+            <span class="badge badge-condenado">Condenado</span>
+            <span class="badge badge-party">PDT</span>
+            <span class="badge badge-state">SP</span>
+            <span class="role-text">Deputado Federal</span>
+          </div>
+          <div class="politician-name">João da Silva</div>
+          <div class="civil-name">João Augusto da Silva</div>
+        </div>
+        <div class="score-area">
+          <div>
+            <div class="score-label">Transparência</div>
+            <div class="score-number-a">35</div>
+          </div>
+          <div class="score-details">
+            <div class="score-max">/ 100</div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== OPTION B ===================== -->
+  <div class="section">
+    <div class="section-label">Opção B — Perfil / Compacto</div>
+    <div class="card-b">
+      <img
+        class="politician-photo card-b-photo"
+        src="https://www.camara.leg.br/internet/deputado/bandep/204379.jpg"
+        alt="Foto do deputado"
+      >
+      <div class="card-b-content">
+        <div class="badges-row">
+          <span class="badge badge-condenado">Condenado</span>
+          <span class="badge badge-party">PDT</span>
+          <span class="badge badge-state">SP</span>
+          <span class="role-text">Deputado Federal</span>
+        </div>
+        <div class="politician-name-b">João da Silva</div>
+        <div class="civil-name">João Augusto da Silva</div>
+      </div>
+      <div class="card-b-score">
+        <span class="score-label-b">Transparência</span>
+        <div class="score-number-b">35</div>
+        <div class="score-bar-b">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" style="width:35%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== OPTION C ===================== -->
+  <div class="section">
+    <div class="section-label">Opção C — Background / Cinemático</div>
+    <div class="card-c">
+      <img
+        class="politician-photo card-c-photo"
+        src="https://www.camara.leg.br/internet/deputado/bandep/204379.jpg"
+        alt="Foto do deputado"
+      >
+      <div class="card-c-gradient"></div>
+      <div class="card-c-score">
+        <span class="score-label-c">Transparência</span>
+        <div class="score-number-c">35</div>
+      </div>
+      <div class="card-c-content">
+        <div class="badges-row">
+          <span class="badge badge-condenado">Condenado</span>
+          <span class="badge badge-party">PDT</span>
+          <span class="badge badge-state">SP</span>
+          <span class="role-text">Deputado Federal</span>
+        </div>
+        <div class="politician-name-c">João da Silva</div>
+        <div class="civil-name" style="color:#555;">João Augusto da Silva</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Foto em P&B via CSS <code>filter: grayscale(100%)</code> — sem processamento no servidor
+  </div>
+
+</body>
+</html>

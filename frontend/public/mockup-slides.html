@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Cards Sem Palanque</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; font-family: 'DM Sans', sans-serif; padding: 40px 20px; }
+
+  .page-title { color: rgba(255,255,255,0.2); font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; text-align: center; margin-bottom: 8px; }
+  .page-sub { color: rgba(255,255,255,0.1); font-size: 12px; text-align: center; margin-bottom: 48px; font-family: 'DM Sans'; }
+
+  .section-label { color: rgba(255,255,255,0.25); font-family: 'Space Grotesk', sans-serif; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; text-align: center; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+  .row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+  .slide-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .slide-num { color: rgba(255,255,255,0.2); font-family: 'Space Grotesk', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
+
+  /* CARD BASE 390×693 */
+  .card { width: 390px; height: 693px; position: relative; overflow: hidden; flex-shrink: 0; }
+
+  /* ── BOTTOM BAR (todos os slides) ── */
+  .bottom-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: #FF2020; padding: 16px 24px;
+  }
+  .bottom-bar.blue { background: #1A6BFF; }
+  .bottom-bar .bname { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
+  .bottom-bar .bsub { font-family: 'DM Sans', sans-serif; font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+  /* ── DOT INDICATORS ── */
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 22px; height: 3px; background: rgba(255,255,255,0.15); }
+  .dot.on { background: #fff; }
+  .dot.on-dark { background: rgba(0,0,0,0.5); }
+  .dot-dark { width: 22px; height: 3px; background: rgba(0,0,0,0.15); }
+
+  /* ════════════════════════════════
+     SLIDE 1 — IDENTIDADE
+  ════════════════════════════════ */
+  .s1 { background: #000; }
+  .s1 .brand { position: absolute; top: 22px; left: 24px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 3px; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+  .s1 .dots-top { position: absolute; top: 50px; left: 24px; }
+
+  /* Photo: left-aligned, square ~55% width */
+  .s1 .photo-area { position: absolute; top: 76px; left: 24px; width: 210px; height: 210px; }
+  .s1 .photo-fallback {
+    width: 100%; height: 100%;
+    background: linear-gradient(160deg, #FF2020 0%, #7a0000 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-size: 100px; font-weight: 900;
+    color: rgba(255,255,255,0.12);
+  }
+  .s1 .photo-fallback.blue-fb { background: linear-gradient(160deg, #1A6BFF 0%, #003080 100%); }
+
+  /* Short line below photo — only as wide as the photo, very subtle */
+  .s1 .divider-line { position: absolute; top: 296px; left: 24px; width: 210px; height: 1px; background: rgba(255,255,255,0.08); }
+
+  .s1 .content { position: absolute; top: 308px; left: 24px; right: 24px; }
+  .s1 .badge { display: inline-block; padding: 5px 12px; margin-bottom: 24px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; background: #FF2020; color: #fff; }
+  .s1 .badge.blue { background: #1A6BFF; }
+  .s1 .badge.yellow { background: #FFE500; color: #000; }
+  .s1 .cname { font-family: 'Space Grotesk', sans-serif; font-size: 74px; font-weight: 900; color: #fff; line-height: 0.87; text-transform: uppercase; margin-bottom: 22px; }
+  .s1 .meta { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.35); letter-spacing: 3px; text-transform: uppercase; }
+
+  /* ════════════════════════════════
+     SLIDE 2 — ÍNDICE
+  ════════════════════════════════ */
+  .s2 { background: #0a0a0a; }
+  .s2 .brand { position: absolute; top: 22px; left: 24px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 3px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+  .s2 .dots-top { position: absolute; top: 50px; left: 24px; }
+
+  .s2 .center { position: absolute; top: 68px; left: 0; right: 0; text-align: center; padding: 0 24px; }
+  .s2 .idx-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 900; letter-spacing: 4px; color: #FF2020; text-transform: uppercase; margin-bottom: 4px; margin-top: 20px; }
+  .s2 .idx-num { font-family: 'Space Grotesk', sans-serif; font-size: 148px; font-weight: 900; line-height: 1; color: #FF2020; letter-spacing: -6px; }
+  .s2 .idx-num.mid { color: #FFE500; }
+  .s2 .idx-num.high { color: #1A6BFF; }
+  .s2 .idx-of { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 900; color: rgba(255,255,255,0.18); letter-spacing: 3px; margin-top: -6px; }
+  .s2 .bar-wrap { width: 260px; height: 4px; background: rgba(255,255,255,0.07); margin: 20px auto 0; }
+  .s2 .bar-fill { height: 100%; background: #FF2020; }
+  .s2 .bar-fill.mid { background: #FFE500; }
+  .s2 .bar-fill.high { background: #1A6BFF; }
+  .s2 .idx-verdict { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.3); letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; }
+
+  /* Candidate block with badge — same style as slide 1 bottom */
+  .s2 .cond-list { position: absolute; bottom: 82px; left: 24px; right: 24px; }
+  .s2 .cond-total { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 900; color: #FF2020; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .s2 .cond-item { padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+  .s2 .cond-item:last-child { border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .s2 .cond-organ { font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 4px; }
+  .s2 .cond-desc { font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4; }
+  .s2 .cond-status { display: inline-block; margin-top: 6px; padding: 2px 8px; background: rgba(255,255,255,0.08); font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+
+  /* ════════════════════════════════
+     SLIDE 3 — GASTOS
+  ════════════════════════════════ */
+  .s3 { background: #000; }
+  .s3 .brand { position: absolute; top: 22px; left: 24px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 3px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+  .s3 .dots-top { position: absolute; top: 50px; left: 24px; }
+
+  .s3 .center { position: absolute; top: 68px; left: 0; right: 0; text-align: center; padding: 0 24px; }
+  .s3 .total-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 900; letter-spacing: 4px; color: #1A6BFF; text-transform: uppercase; margin-bottom: 4px; margin-top: 20px; }
+  .s3 .total-num { font-family: 'Space Grotesk', sans-serif; font-size: 80px; font-weight: 900; color: #1A6BFF; line-height: 1; letter-spacing: -3px; }
+  .s3 .total-word { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 900; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 2px; margin-top: -4px; }
+
+  .s3 .content { position: absolute; top: 290px; left: 24px; right: 24px; bottom: 82px; }
+
+  .s3 .chart-title { font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 900; letter-spacing: 3px; color: rgba(255,255,255,0.2); text-transform: uppercase; margin-bottom: 8px; }
+  .s3 .bars { display: flex; align-items: flex-end; gap: 3px; height: 80px; margin-bottom: 16px; }
+  .s3 .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .s3 .bar-rect { width: 100%; background: #1A6BFF; min-height: 3px; }
+  .s3 .bar-mlabel { font-family: 'Space Grotesk', sans-serif; font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.2); }
+
+  .s3 .expense-list {}
+  .s3 .exp-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .s3 .exp-name { font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.45); flex: 1; padding-right: 8px; }
+  .s3 .exp-right { display: flex; align-items: center; gap: 8px; }
+  .s3 .exp-bar-wrap { width: 40px; height: 3px; background: rgba(255,255,255,0.06); }
+  .s3 .exp-bar-fill { height: 100%; background: #1A6BFF; }
+  .s3 .exp-val { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 900; color: #1A6BFF; white-space: nowrap; min-width: 38px; text-align: right; }
+
+  /* ════════════════════════════════
+     SLIDE 4 — PROMESSAS VS DISCURSOS
+  ════════════════════════════════ */
+  .s4 { background: #0a0a0a; }
+  .s4 .brand { position: absolute; top: 22px; left: 24px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 900; letter-spacing: 3px; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+  .s4 .dots-top { position: absolute; top: 50px; left: 24px; }
+
+  .s4 .center { position: absolute; top: 68px; left: 0; right: 0; text-align: center; padding: 0 24px; }
+  .s4 .score-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 900; letter-spacing: 4px; color: #FFE500; text-transform: uppercase; margin-bottom: 4px; margin-top: 20px; }
+  .s4 .score-num { font-family: 'Space Grotesk', sans-serif; font-size: 148px; font-weight: 900; color: #FFE500; line-height: 1; letter-spacing: -6px; }
+  .s4 .score-word { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 900; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 2px; margin-top: -6px; }
+
+  .s4 .content { position: absolute; top: 310px; left: 24px; right: 24px; bottom: 82px; }
+
+  .s4 .stats-row { display: flex; gap: 0; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.06); }
+  .s4 .stat-box { flex: 1; padding: 8px 6px; text-align: center; border-right: 1px solid rgba(255,255,255,0.06); }
+  .s4 .stat-box:last-child { border-right: none; }
+  .s4 .stat-n { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 900; line-height: 1; }
+  .s4 .stat-n.green { color: #22c55e; }
+  .s4 .stat-n.red { color: #FF2020; }
+  .s4 .stat-n.gray { color: rgba(255,255,255,0.2); }
+  .s4 .stat-l { font-family: 'Space Grotesk', sans-serif; font-size: 8px; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.2); text-transform: uppercase; margin-top: 3px; }
+
+  .s4 .promise-list { display: flex; flex-direction: column; gap: 7px; }
+  .s4 .p-item { padding: 9px 12px; border-left: 3px solid; background: rgba(255,255,255,0.02); }
+  .s4 .p-item.cumprida { border-color: #22c55e; }
+  .s4 .p-item.contradita { border-color: #FF2020; }
+  .s4 .p-verdict { font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px; }
+  .s4 .p-item.cumprida .p-verdict { color: #22c55e; }
+  .s4 .p-item.contradita .p-verdict { color: #FF2020; }
+  .s4 .p-text { font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+  .divider { width: 100%; height: 1px; background: rgba(255,255,255,0.04); margin: 48px 0; }
+</style>
+</head>
+<body>
+
+<p class="page-title">Mockup — Cards Sem Palanque v2</p>
+<p class="page-sub">4 slides · Formato Story 9:16 · Aguardando aprovação</p>
+
+<!-- SEQUÊNCIA: 4 SLIDES -->
+<div class="section-label">Sequência — 4 Slides</div>
+<div class="row">
+
+  <!-- SLIDE 1 -->
+  <div class="slide-wrap">
+    <div class="slide-num">Slide 1 · Identidade</div>
+    <div class="card s1">
+      <div class="s1 brand">SEM PALANQUE</div>
+      <div class="s1 dots-top"><div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+      <div class="s1 photo-area"><div class="s1 photo-fallback">J</div></div>
+      <div class="s1 divider-line"></div>
+      <div class="s1 content">
+        <span class="s1 badge">CONDENADO</span>
+        <div class="s1 cname">JOÃO<br>DA SILVA</div>
+        <div class="s1 meta">PDT · SP · DEP. FEDERAL</div>
+      </div>
+      <div class="bottom-bar">
+        <div class="bname">SEM PALANQUE</div>
+        <div class="bsub">Os candidatos como eles são.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide-wrap">
+    <div class="slide-num">Slide 2 · Score de Integridade</div>
+    <div class="card s2">
+      <div class="s2 brand">SEM PALANQUE</div>
+      <div class="s2 dots-top"><div class="dots"><div class="dot"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div></div>
+      <div class="s2 center">
+        <div class="idx-label">Score de Integridade</div>
+        <div class="idx-num">35</div>
+        <div class="idx-of">DE 100</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:35%"></div></div>
+        <div class="idx-verdict">Baixa integridade</div>
+      </div>
+      <div class="s2 cond-list">
+        <div class="s2 cond-total">2 CONDENAÇÕES</div>
+        <div class="s2 cond-item">
+          <div class="s2 cond-organ">TCU · Administrativa · 2021</div>
+          <div class="s2 cond-desc">Irregularidades em convênio com o Ministério da Saúde com desvio de finalidade de recursos públicos.</div>
+          <span class="s2 cond-status">Trânsito em julgado</span>
+        </div>
+        <div class="s2 cond-item">
+          <div class="s2 cond-organ">TRE-SP · Eleitoral · 2019</div>
+          <div class="s2 cond-desc">Abuso de poder econômico em campanha eleitoral de 2018.</div>
+          <span class="s2 cond-status">Em recurso</span>
+        </div>
+      </div>
+      <div class="bottom-bar">
+        <div class="bname">SEM PALANQUE</div>
+        <div class="bsub">Os candidatos como eles são.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide-wrap">
+    <div class="slide-num">Slide 3 · Gastos com Verba Pública</div>
+    <div class="card s3">
+      <div class="s3 brand">SEM PALANQUE</div>
+      <div class="s3 dots-top"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div></div>
+      <div class="s3 center">
+        <div class="total-label">Gastos com verba pública em 2024</div>
+        <div class="total-num">R$ 120k</div>
+        <div class="total-word">Verba pública</div>
+      </div>
+      <div class="s3 content">
+        <div class="chart-title">Por mês</div>
+        <div class="bars">
+          <div class="bar-col"><div class="bar-rect" style="height:53%"></div><div class="bar-mlabel">J</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:70%"></div><div class="bar-mlabel">F</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:61%"></div><div class="bar-mlabel">M</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:84%"></div><div class="bar-mlabel">A</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:63%"></div><div class="bar-mlabel">M</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:100%"></div><div class="bar-mlabel">J</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:77%"></div><div class="bar-mlabel">J</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:74%"></div><div class="bar-mlabel">A</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:89%"></div><div class="bar-mlabel">S</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:60%"></div><div class="bar-mlabel">O</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:56%"></div><div class="bar-mlabel">N</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:91%"></div><div class="bar-mlabel">D</div></div>
+        </div>
+        <div class="expense-list">
+          <div class="exp-item">
+            <div class="exp-name">Divulgação parlamentar</div>
+            <div class="exp-right"><div class="exp-bar-wrap"><div class="exp-bar-fill" style="width:100%"></div></div><div class="exp-val">R$ 48k</div></div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-name">Passagens aéreas</div>
+            <div class="exp-right"><div class="exp-bar-wrap"><div class="exp-bar-fill" style="width:50%"></div></div><div class="exp-val">R$ 24k</div></div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-name">Hospedagem</div>
+            <div class="exp-right"><div class="exp-bar-wrap"><div class="exp-bar-fill" style="width:37%"></div></div><div class="exp-val">R$ 18k</div></div>
+          </div>
+          <div class="exp-item">
+            <div class="exp-name">Combustíveis</div>
+            <div class="exp-right"><div class="exp-bar-wrap"><div class="exp-bar-fill" style="width:30%"></div></div><div class="exp-val">R$ 14k</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-bar blue">
+        <div class="bname">SEM PALANQUE</div>
+        <div class="bsub">Os candidatos como eles são.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide-wrap">
+    <div class="slide-num">Slide 4 · Promessas vs Discursos</div>
+    <div class="card s4">
+      <div class="s4 brand">SEM PALANQUE</div>
+      <div class="s4 dots-top"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div></div>
+      <div class="s4 center">
+        <div class="score-label">Coerência entre promessas e<br>discursos</div>
+        <div class="score-num">50%</div>
+        <div class="score-word">De coerência</div>
+      </div>
+      <div class="s4 content">
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-n green">1</div><div class="stat-l">Cumprida</div></div>
+          <div class="stat-box"><div class="stat-n red">1</div><div class="stat-l">Contradita</div></div>
+        </div>
+        <div class="promise-list">
+          <div class="p-item cumprida">
+            <div class="p-verdict">✓ Cumprida</div>
+            <div class="p-text">"30% dos royalties do petróleo para educação" — confirmado em plenário jun/2024</div>
+          </div>
+          <div class="p-item contradita">
+            <div class="p-verdict">✕ Contradita</div>
+            <div class="p-text">"Nunca votarei por cortes no SUS" — votou pela PEC que reduziu R$ 200mi em mai/2024</div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-bar" style="background:#FFE500">
+        <div class="bname" style="color:#000">SEM PALANQUE</div>
+        <div class="bsub" style="color:rgba(0,0,0,0.5)">Os candidatos como eles são.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
