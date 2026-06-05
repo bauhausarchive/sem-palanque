@@ -29,7 +29,7 @@ async function searchMock(query: string): Promise<PoliticoSearchResult[]> {
       p.nome.toLowerCase().includes(q) ||
       p.partido.toLowerCase().includes(q) ||
       p.siglaUf.toLowerCase().includes(q)
-  ).slice(0, 20)
+  ).slice(0, 513)
 }
 import { cn } from '@/lib/utils'
 
