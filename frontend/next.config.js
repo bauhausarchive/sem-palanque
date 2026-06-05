@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: process.env.NEXT_OUTPUT === 'export' ? 'export' : undefined,
+  output: 'export',
   trailingSlash: true,
   // Set basePath to your GitHub Pages repo name, e.g. '/politico-transparente'
   // Leave empty for custom domain or root deployment
