@@ -51,19 +51,17 @@ export default function HomePage() {
     setSearchQuery(p.nome)
   }
 
+  async function handleShowAll() {
+    const allPoliticos = await featuredStaticPoliticos(513)
+    setFeatured(allPoliticos)
+  }
+
   const displayStats = stats ?? MOCK_STATS
 
   return (
     <>
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-16 md:py-24 border-b border-[#1a1a1a]">
-        {/* Geometric diagonal accent */}
-        <div
-          className="pointer-events-none absolute right-0 top-0 h-full w-1/3 opacity-10"
-          style={{
-            background: 'linear-gradient(135deg, transparent 40%, #FF2020 40%, #FF2020 42%, transparent 42%)',
-          }}
-        />
         <div className="container relative mx-auto px-4">
           <h1
             className="mb-6 text-5xl font-black uppercase tracking-tighter text-white md:text-7xl lg:text-8xl"
@@ -154,12 +152,13 @@ export default function HomePage() {
               Em Destaque
             </h2>
           </div>
-          <Link
-            href="/?todos=1"
+          <button
+            type="button"
+            onClick={handleShowAll}
             className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#FF2020] hover:text-white transition-colors"
           >
             Ver todos <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          </button>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((p) => (

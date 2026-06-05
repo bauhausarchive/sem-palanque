@@ -26,7 +26,7 @@ export default function PoliticoCard({ politico, className }: PoliticoCardProps)
 
   return (
     <Link
-      href={`/politico/${id}`}
+      href={`/politico/index?id=${id}`}
       className={cn(
         'group relative flex flex-col bg-[#0a0a0a] border border-[#1a1a1a]',
         'hover:border-white transition-colors duration-150',
