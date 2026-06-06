@@ -80,22 +80,28 @@ export default function HomePage() {
             Tudo com dados abertos do governo federal.
           </p>
 
-          <div className="max-w-xl">
-            <SearchBar autoFocus onSelect={handleSearchSelect} />
+          <div className="flex max-w-3xl flex-col gap-3 sm:flex-row">
+            <div className="w-full sm:max-w-md">
+              <SearchBar autoFocus onSelect={handleSearchSelect} />
+            </div>
+
+            <select className="h-[58px] border-2 border-[#A3A3A3] bg-black px-6 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:border-white sm:w-40">
+              <option>UF</option>
+            </select>
+
+            <select className="h-[58px] border-2 border-[#A3A3A3] bg-black px-6 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:border-white sm:w-52">
+              <option>Partido</option>
+            </select>
           </div>
-              <p className="mt-3 text-xs font-medium text-white/40">
+
+          <p className="mt-3 text-xs font-medium text-white/40">
             Busque por nome, partido ou estado — ex: &ldquo;Silva SP&rdquo;, &ldquo;MDB&rdquo;
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-5">
-            <Link
-              href="/politicos"
-              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#FF2020] hover:text-white transition-colors"
-            >
-              Explorar deputados <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+
+          <div className="mt-8">
             <Link
               href="/rankings"
-              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
             >
               Ver rankings <ArrowRight className="h-3.5 w-3.5" />
             </Link>
