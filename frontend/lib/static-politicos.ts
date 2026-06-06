@@ -45,7 +45,7 @@ function normalizePolitico(p: Partial<Politico> & PoliticoSearchResult): Politic
 
 export async function loadStaticPoliticos(): Promise<Politico[]> {
   if (cache) return cache
-  const deputados = await fetchJson<Politico>('/data/deputados.json')
+  const deputados = await fetchJson<Politico>('/data/deputados-enriquecidos.json')
   cache = deputados.map(normalizePolitico)
   return cache
 }
