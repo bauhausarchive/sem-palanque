@@ -125,7 +125,7 @@ export default function Home() {
             Busque por nome, partido ou estado — ex: “Silva SP”, “MDB”
           </p>
 
-          <div className="mt-16">
+          <div className="mt-28">
             <Link
               href="/rankings"
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
@@ -151,7 +151,7 @@ export default function Home() {
               color="#FF2020"
             />
             <StatCard
-              value={formatCurrency(MOCK_STATS.total_gastos_ceap).replace(',00', '')}
+              value="R$ 285MI"
               label="Gastos com verba pública"
               color="#1A6BFF"
             />
@@ -246,7 +246,7 @@ function StatCard({
   return (
     <div className="py-10 px-6">
       <p
-        className="text-5xl font-black tracking-tighter"
+        className="text-4xl font-black tracking-tighter md:text-5xl"
         style={{
           color,
           fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif',
