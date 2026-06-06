@@ -98,7 +98,13 @@ export default function HomePage() {
             Busque por nome, partido ou estado — ex: &ldquo;Silva SP&rdquo;, &ldquo;MDB&rdquo;
           </p>
 
-          <div className="mt-8">
+          <div className="mt-16 flex flex-wrap items-center gap-6">
+            <Link
+              href="/politicos"
+              className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#FF2020] hover:text-white transition-colors"
+            >
+              Explorar deputados <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
             <Link
               href="/rankings"
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
