@@ -11,14 +11,18 @@ type DeputadoRanking = {
   partido: string
   siglaUf: string
   urlFoto?: string
-  ano_gastos?: number
   total_gastos_cota_parlamentar?: number
   quantidade_despesas?: number
-  fonte_gastos?: string
+  total_divulgacao?: number
+  total_combustiveis?: number
+  total_passagens_aereas?: number
+  total_aluguel_veiculos?: number
 }
 
 async function fetchRankings(): Promise<DeputadoRanking[]> {
   const paths = [
+    '/sem-palanque/data/deputados-gastos-tipos.json',
+    '/data/deputados-gastos-tipos.json',
     '/sem-palanque/data/deputados-enriquecidos.json',
     '/data/deputados-enriquecidos.json',
   ]
@@ -40,14 +44,49 @@ export default function RankingsPage() {
     fetchRankings().then(setDeputados)
   }, [])
 
-  const maisGastos = useMemo(() => {
-    return [...deputados]
-      .sort(
-        (a, b) =>
-          (b.total_gastos_cota_parlamentar ?? 0) -
-          (a.total_gastos_cota_parlamentar ?? 0)
-      )
-      .slice(0, 20)
+  const rankings = useMemo(() => {
+    return [
+      {
+        title: 'Mais gastos de Cota Parlamentar',
+        eyebrow: 'Câmara dos Deputados / CEAP',
+        field: 'total_gastos_cota_parlamentar' as keyof DeputadoRanking,
+        color: '#1A6BFF',
+        note: 'Total de despesas líquidas da Cota para o Exercício da Atividade Parlamentar em 2024.',
+      },
+      {
+        title: 'Mais gastos com Divulgação',
+        eyebrow: 'Divulgação da atividade parlamentar',
+        field: 'total_divulgacao' as keyof DeputadoRanking,
+        color: '#FF2020',
+        note: 'Gastos classificados pela Câmara como divulgação da atividade parlamentar.',
+      },
+      {
+        title: 'Mais gastos com Combustíveis',
+        eyebrow: 'Combustíveis e lubrificantes',
+        field: 'total_combustiveis' as keyof DeputadoRanking,
+        color: '#FFE500',
+        note: 'Gastos classificados pela Câmara como combustíveis e lubrificantes.',
+      },
+      {
+        title: 'Mais gastos com Passagens Aéreas',
+        eyebrow: 'Passagens aéreas',
+        field: 'total_passagens_aereas' as keyof DeputadoRanking,
+        color: '#1A6BFF',
+        note: 'Inclui despesas de passagem aérea registradas na base oficial da Câmara.',
+      },
+      {
+        title: 'Mais gastos com Veículos',
+        eyebrow: 'Locação ou fretamento de veículos',
+        field: 'total_aluguel_veiculos' as keyof DeputadoRanking,
+        color: '#FF2020',
+        note: 'Gastos classificados como locação ou fretamento de veículos automotores.',
+      },
+    ].map((ranking) => ({
+      ...ranking,
+      data: [...deputados]
+        .sort((a, b) => Number(b[ranking.field] ?? 0) - Number(a[ranking.field] ?? 0))
+        .slice(0, 10),
+    }))
   }, [deputados])
 
   return (
@@ -85,84 +124,21 @@ export default function RankingsPage() {
       </section>
 
       <section className="container mx-auto px-4 py-12">
-        <div className="mb-8 flex items-end justify-between gap-6">
-          <div>
-            <p className="mb-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF]">
-              Câmara dos Deputados / CEAP
-            </p>
-            <h2
-              className="text-4xl font-black uppercase tracking-tighter text-white md:text-5xl"
-              style={{
-                fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif',
-                lineHeight: 0.95,
-              }}
-            >
-              Mais gastos de<br />
-              Cota Parlamentar
-            </h2>
-          </div>
-
-          <div className="hidden text-right sm:block">
-            <p className="text-xs font-black uppercase tracking-widest text-white/40">
-              Ano-base
-            </p>
-            <p className="text-3xl font-black text-[#FF2020]">2024</p>
-          </div>
-        </div>
-
-        <div className="border-t border-[#1a1a1a]">
-          {maisGastos.map((p, index) => (
-            <Link
-              key={p.id}
-              href={`/politico/index?id=${p.id}`}
-              className="group grid grid-cols-[48px_1fr] gap-4 border-b border-[#1a1a1a] py-5 transition-colors hover:bg-[#0a0a0a] sm:grid-cols-[64px_72px_1fr_220px]"
-            >
-              <div
-                className="text-4xl font-black leading-none text-white/20 group-hover:text-[#FF2020]"
-                style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif' }}
-              >
-                {String(index + 1).padStart(2, '0')}
-              </div>
-
-              <div className="hidden sm:block">
-                {p.urlFoto ? (
-                  <img
-                    src={p.urlFoto}
-                    alt={p.nome}
-                    className="h-16 w-16 object-cover object-top grayscale"
-                  />
-                ) : (
-                  <div className="flex h-16 w-16 items-center justify-center bg-[#1a1a1a] text-2xl font-black text-white/30">
-                    {p.nome.charAt(0)}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <h3 className="text-xl font-black uppercase tracking-tight text-white group-hover:text-[#FF2020]">
-                  {p.nome}
-                </h3>
-                <p className="mt-1 text-xs font-black uppercase tracking-widest text-white/40">
-                  {p.partido} / {p.siglaUf} · {p.quantidade_despesas ?? 0} despesas
-                </p>
-              </div>
-
-              <div className="col-span-2 flex items-center justify-between sm:col-span-1 sm:justify-end sm:text-right">
-                <div>
-                  <p className="text-2xl font-black text-[#1A6BFF]">
-                    {formatCurrency(p.total_gastos_cota_parlamentar ?? 0)}
-                  </p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white/30">
-                    Cota Parlamentar
-                  </p>
-                </div>
-                <ArrowRight className="ml-4 h-4 w-4 text-white/20 group-hover:text-white sm:hidden" />
-              </div>
-            </Link>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {rankings.map((ranking) => (
+            <RankingBlock
+              key={ranking.title}
+              title={ranking.title}
+              eyebrow={ranking.eyebrow}
+              color={ranking.color}
+              note={ranking.note}
+              field={ranking.field}
+              data={ranking.data}
+            />
           ))}
         </div>
 
-        <p className="mt-4 text-xs font-medium text-white/35">
+        <p className="mt-6 text-xs font-medium text-white/35">
           Fonte: Câmara dos Deputados — Dados Abertos / Cota para o Exercício da
           Atividade Parlamentar. Valores calculados a partir de despesas líquidas de 2024.
         </p>
@@ -186,6 +162,100 @@ export default function RankingsPage() {
         />
       </section>
     </main>
+  )
+}
+
+function RankingBlock({
+  title,
+  eyebrow,
+  color,
+  note,
+  field,
+  data,
+}: {
+  title: string
+  eyebrow: string
+  color: string
+  note: string
+  field: keyof DeputadoRanking
+  data: DeputadoRanking[]
+}) {
+  return (
+    <div className="border border-[#1a1a1a] bg-[#050505]">
+      <div className="border-b border-[#1a1a1a] p-6">
+        <p
+          className="mb-2 text-xs font-black uppercase tracking-widest"
+          style={{ color }}
+        >
+          {eyebrow}
+        </p>
+        <h2
+          className="text-3xl font-black uppercase tracking-tighter text-white"
+          style={{
+            fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif',
+            lineHeight: 0.95,
+          }}
+        >
+          {title}
+        </h2>
+        <p className="mt-3 text-xs font-medium leading-relaxed text-white/40">
+          {note}
+        </p>
+      </div>
+
+      <div>
+        {data.map((p, index) => {
+          const value = Number(p[field] ?? 0)
+
+          return (
+            <Link
+              key={`${title}-${p.id}`}
+              href={`/politico/index?id=${p.id}`}
+              className="group grid grid-cols-[40px_1fr] gap-3 border-b border-[#1a1a1a] p-4 transition-colors last:border-b-0 hover:bg-[#0a0a0a] sm:grid-cols-[44px_52px_1fr]"
+            >
+              <div
+                className="text-2xl font-black leading-none text-white/20 group-hover:text-white"
+                style={{ fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif' }}
+              >
+                {String(index + 1).padStart(2, '0')}
+              </div>
+
+              <div className="hidden sm:block">
+                {p.urlFoto ? (
+                  <img
+                    src={p.urlFoto}
+                    alt={p.nome}
+                    className="h-12 w-12 object-cover object-top grayscale"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center bg-[#1a1a1a] text-xl font-black text-white/30">
+                    {p.nome.charAt(0)}
+                  </div>
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-black uppercase tracking-tight text-white group-hover:text-[#FF2020]">
+                  {p.nome}
+                </h3>
+                <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-white/35">
+                  {p.partido} / {p.siglaUf}
+                </p>
+                <p
+                  className="mt-2 text-xl font-black tracking-tight"
+                  style={{
+                    color,
+                    fontFamily: 'var(--font-space-grotesk), Space Grotesk, sans-serif',
+                  }}
+                >
+                  {formatCurrency(value).replace(',00', '')}
+                </p>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
