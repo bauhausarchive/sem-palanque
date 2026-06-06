@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-black py-16 md:py-24 border-b border-[#1a1a1a]">
+      <section className="relative overflow-hidden bg-black pt-16 pb-8 md:pt-24 md:pb-8 border-b border-[#1a1a1a]">
         <div className="container relative mx-auto px-4">
           <h1
             className="mb-6 text-5xl font-black uppercase tracking-tighter text-white md:text-7xl lg:text-8xl"
@@ -125,7 +125,7 @@ export default function Home() {
             Busque por nome, partido ou estado — ex: “Silva SP”, “MDB”
           </p>
 
-          <div className="mt-28">
+          <div className="mt-12">
             <Link
               href="/rankings"
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
