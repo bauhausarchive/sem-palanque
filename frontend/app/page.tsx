@@ -86,6 +86,20 @@ export default function HomePage() {
               <p className="mt-3 text-xs font-medium text-white/40">
             Busque por nome, partido ou estado — ex: &ldquo;Silva SP&rdquo;, &ldquo;MDB&rdquo;
           </p>
+          <div className="mt-8 flex flex-wrap items-center gap-5">
+            <Link
+              href="/politicos"
+              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#FF2020] hover:text-white transition-colors"
+            >
+              Explorar deputados <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link
+              href="/rankings"
+              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
+            >
+              Ver rankings <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -151,20 +165,6 @@ export default function HomePage() {
             >
               Em Destaque
             </h2>
-          </div>
-          <div className="flex items-center gap-5">
-            <Link
-              href="/politicos"
-              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#FF2020] hover:text-white transition-colors"
-            >
-              Explorar deputados <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-            <Link
-              href="/rankings"
-              className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#1A6BFF] hover:text-white transition-colors"
-            >
-              Ver rankings <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
           </div>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
