@@ -152,13 +152,12 @@ export default function HomePage() {
               Em Destaque
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={handleShowAll}
+          <Link
+            href="/politicos"
             className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#FF2020] hover:text-white transition-colors"
           >
-            Ver todos <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+            Explorar todos <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((p) => (
