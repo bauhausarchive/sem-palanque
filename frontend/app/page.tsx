@@ -11,7 +11,7 @@ import { featuredStaticPoliticos, searchStaticPoliticos } from '@/lib/static-pol
 import Link from 'next/link'
 
 const MOCK_STATS: Stats = {
-  total_politicos: 594,
+  total_politicos: 513,
   total_condenados: 87,
   total_processos: 312,
   total_gastos_ceap: 285_000_000,
